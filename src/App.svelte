@@ -20,9 +20,9 @@
 		margin: 0 auto;
 	}
 
-	@media (min-width: 500px) {
+	@media (min-width: 480px) {
 		main {
-			max-width: 500px;
+			max-width: 480px;
 		}
 	}
 </style>

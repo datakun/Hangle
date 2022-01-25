@@ -4,9 +4,18 @@
 	import Delete from './images/backspace_white_24dp.svg';
 
 	onMount(() => {
+		const screenWidth = window.innerWidth;
+		const width = screenWidth > 480 ? 480 - 60 : screenWidth - 60;
+		const buttonWidth = width / 10;
+		const buttonHeight = buttonWidth * 1.5;
+
+		/** @type {HTMLCollectionOf<HTMLButtonElement>}*/
 		const buttons = document.getElementsByClassName('button');
 		for (const button of buttons) {
 			button.addEventListener('click', handleKeyClick, false);
+			button.style.width = `${buttonWidth}px`;
+			button.style.height = `${buttonHeight}px`;
+			button.style.lineHeight = `${buttonHeight}px`;
 		}
 	});
 
@@ -69,7 +78,7 @@
 		<div id="key-n" class="button">ㅜ</div>
 		<div id="key-m" class="button">ㅡ</div>
 		<div id="key-delete" class="button delete">
-			<Icon data={Delete} height="48px" color="white" />
+			<Icon data={Delete} color="white" style="height: 100%" />
 		</div>
 	</div>
 </div>
@@ -88,14 +97,16 @@
 	}
 
 	.button {
-		width: 42px;
-		height: 54px;
+		display: flex;
+		flex-direction: column;
+		justify-items: center;
+		align-items: center;
 		margin: 3px;
-		line-height: 54px;
 		border-radius: 4px;
 		color: rgb(220, 220, 220);
 		background-color: rgb(130, 130, 130);
 		font-weight: 700;
+		font-size: 1.35em;
 		cursor: pointer;
 		text-align: center;
 		user-select: none;
@@ -108,7 +119,7 @@
 	}
 
 	.enter {
-		font-size: 14px;
+		font-size: 0.85em;
 		flex: 1;
 	}
 
