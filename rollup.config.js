@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
+import { string } from 'rollup-plugin-string';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -19,12 +20,12 @@ function serve() {
 			if (server) return;
 			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
-				shell: true
+				shell: true,
 			});
 
 			process.on('SIGTERM', toExit);
 			process.on('exit', toExit);
-		}
+		},
 	};
 }
 
@@ -34,14 +35,14 @@ export default {
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
-		file: 'public/build/bundle.js'
+		file: 'public/build/bundle.js',
 	},
 	plugins: [
 		svelte({
 			compilerOptions: {
 				// enable run-time checks when not in production
-				dev: !production
-			}
+				dev: !production,
+			},
 		}),
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
@@ -54,9 +55,12 @@ export default {
 		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
-			dedupe: ['svelte']
+			dedupe: ['svelte'],
 		}),
 		commonjs(),
+		string({
+			include: 'src/images/**/*.svg',
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
@@ -68,9 +72,9 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
 	],
 	watch: {
-		clearScreen: false
-	}
+		clearScreen: false,
+	},
 };
