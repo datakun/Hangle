@@ -1,6 +1,10 @@
 body {
 	margin: 0px;
 	background-color: rgb(18, 18, 18);
+	-ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 div.button.correct {

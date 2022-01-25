@@ -1,9 +1,10 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 	import Icon from 'svelte-icon';
-	import Delete from './images/backspace_white_24dp.svg';
+	import Delete from './images/backspace.svg';
 
 	onMount(() => {
+		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
 		const screenWidth = window.innerWidth;
 		const width = screenWidth > 480 ? 480 - 60 : screenWidth - 60;
 		const buttonWidth = width / 10;
@@ -25,6 +26,7 @@
 	};
 
 	onDestroy(() => {
+		// 컴포넌트가 파괴되면 버튼 이벤트 연결 해제
 		const buttons = document.getElementsByClassName('button');
 		for (const button of buttons) {
 			button.removeEventListener('click', handleKeyClick, false);
@@ -109,9 +111,6 @@
 		font-size: 1.35em;
 		cursor: pointer;
 		text-align: center;
-		user-select: none;
-		-moz-user-select: none;
-		-webkit-user-select: none;
 	}
 
 	.empty {

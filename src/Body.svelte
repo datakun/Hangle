@@ -1,3 +1,7 @@
+<script>
+	// TODO: 스토어에서 값을 받아서 box 채우기
+</script>
+
 <div class="body">
 	{#each new Array(6) as n}
 		<div class="row-container line-{n}">
@@ -34,8 +38,5 @@
 		font-size: xx-large;
 		text-align: center;
 		line-height: 64px;
-		user-select: none;
-		-moz-user-select: none;
-		-webkit-user-select: none;
 	}
 </style>
