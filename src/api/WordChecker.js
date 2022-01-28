@@ -1,13 +1,4 @@
-/**
- * @typedef {Object} WordCheckerRerquest
- * @property {string} key
- * @property {string} q
- * @property {string} req_type
- */
-
-/**
- * @typedef {Object} WordCheckerResponse
- */
+import { KOREAN_SEARCH_KEY } from './Secrets';
 
 export async function searchWord(word) {
 	try {
