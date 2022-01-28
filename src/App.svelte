@@ -3,6 +3,7 @@
 	import Body from './Body.svelte';
 	import Keyboard from './Keyboard.svelte';
 	import { tryIndex, letterBoxCount, totalTryCount } from './store/GameStore';
+	import Hangul from 'hangul-js';
 	import { onDestroy, onMount } from 'svelte/internal';
 	import { searchWord } from './WordChecker';
 
@@ -73,7 +74,8 @@
 				return;
 			}
 
-			const result = await searchWord(currentAnswer);
+			const word = Hangul.a(currentAnswer);
+			const result = await searchWord(word);
 			if (result === null) {
 				// TODO: 사전에서 단어 검색. 특정 시간 동안 단어 시도할 수 있는 횟수를 제한한다.
 				runShakeAnimation($tryIndex);

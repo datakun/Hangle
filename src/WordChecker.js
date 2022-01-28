@@ -6,7 +6,6 @@ export async function searchWord(word) {
 		const response = await fetch(encodeURI(url), {
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/json',
 				'Access-Control-Allow-Origin': '*',
 			},
 		});
