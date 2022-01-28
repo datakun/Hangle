@@ -50,9 +50,9 @@
 	};
 
 	const handleKeyInsert = (e) => {
-		// 한글 자음 모음 체크
 		const character = e.detail;
 		if (character.length === 1) {
+			// 한글 자음 모음 삽입
 			if (character.match(/[ㄱ-ㅎㅏ-ㅣ]/)) {
 				let currentAnswer = answerList[$tryIndex];
 				if (currentAnswer.length < $letterBoxCount) {
@@ -63,6 +63,7 @@
 				}
 			}
 		} else if (character === 'enter') {
+			// 단어 검증
 			const currentAnswer = answerList[$tryIndex];
 			if (currentAnswer.length !== $letterBoxCount) {
 				runShakeAnimation($tryIndex);
@@ -83,6 +84,7 @@
 
 			tryIndex.set($tryIndex + 1);
 		} else if (character === 'backspace' || character === 'delete') {
+			// 문자 삭제
 			let currentAnswer = answerList[$tryIndex];
 			if (currentAnswer.length > 0) {
 				currentAnswer = currentAnswer.substring(0, currentAnswer.length - 1);
