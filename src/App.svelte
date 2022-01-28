@@ -4,7 +4,7 @@
 	import Keyboard from './Keyboard.svelte';
 	import { tryIndex, letterBoxCount, totalTryCount } from './store/GameStore';
 	import { onDestroy, onMount } from 'svelte/internal';
-	import { searchWord } from './api/WordChecker';
+	import { searchWord } from './WordChecker';
 
 	/** @type {string[]} */
 	let answerList = new Array($totalTryCount);
