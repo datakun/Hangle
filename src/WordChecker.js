@@ -1,8 +1,6 @@
-import { KOREAN_SEARCH_KEY } from './Secrets';
-
 export async function searchWord(word) {
 	try {
-		const url = `https://stdict.korean.go.kr/api/search.do?&key=${KOREAN_SEARCH_KEY}&req_type=json&q=${word}`;
+		const url = `https://stdict.korean.go.kr/api/search.do?&key=80E105230FCD3224499425D80C5B6037&req_type=json&q=${word}`;
 
 		// fetch get request
 		const response = await fetch(encodeURI(url), {
