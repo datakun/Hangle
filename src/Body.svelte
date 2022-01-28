@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { tryIndex, letterBoxCount, letterCount } from './gameStore';
+	import { tryIndex, letterBoxCount, letterCount } from './GameStore';
 	import Hangul from 'hangul-js';
 
 	/** @type {string[]} */

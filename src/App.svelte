@@ -2,8 +2,9 @@
 	import Head from './Head.svelte';
 	import Body from './Body.svelte';
 	import Keyboard from './Keyboard.svelte';
-	import { tryIndex, letterBoxCount, totalTryCount } from './gameStore';
+	import { tryIndex, letterBoxCount, totalTryCount } from './GameStore';
 	import { onDestroy, onMount } from 'svelte/internal';
+	import { searchWord } from './api/WordChecker';
 
 	/** @type {string[]} */
 	let answerList = new Array($totalTryCount);
@@ -49,7 +50,7 @@
 		}
 	};
 
-	const handleKeyInsert = (e) => {
+	const handleKeyInsert = async (e) => {
 		const character = e.detail;
 		if (character.length === 1) {
 			// 한글 자음 모음 삽입
@@ -72,7 +73,8 @@
 				return;
 			}
 
-			if (false) {
+			const result = await searchWord(currentAnswer);
+			if (result === null) {
 				// TODO: 사전에서 단어 검색. 특정 시간 동안 단어 시도할 수 있는 횟수를 제한한다.
 				runShakeAnimation($tryIndex);
 				showSnackbar('올바른 단어를 입력하세요.');
