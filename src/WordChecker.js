@@ -5,6 +5,7 @@ export async function searchWord(word) {
 		// fetch get request
 		const response = await fetch(encodeURI(url), {
 			method: 'GET',
+			mode: 'no-cors',
 			headers: {
 				'Access-Control-Allow-Origin': '*',
 			},
