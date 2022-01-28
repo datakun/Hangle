@@ -63,7 +63,6 @@
 				}
 			}
 		} else if (character === 'enter') {
-			// TODO: 정답 제출
 			const currentAnswer = answerList[$tryIndex];
 			if (currentAnswer.length !== $letterBoxCount) {
 				runShakeAnimation($tryIndex);
@@ -79,6 +78,8 @@
 
 				return;
 			}
+
+			return;
 
 			tryIndex.set($tryIndex + 1);
 		} else if (character === 'backspace' || character === 'delete') {

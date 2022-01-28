@@ -5,7 +5,7 @@
 	onMount(() => {
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
 		const screenWidth = window.innerWidth;
-		const width = screenWidth > 480 ? 480 - 60 : screenWidth - 60;
+		const width = screenWidth > 480 ? 480 - 60 - 16 : screenWidth - 60 - 16;
 		const buttonWidth = width / 10;
 		const buttonHeight = buttonWidth * 1.5;
 

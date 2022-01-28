@@ -16,7 +16,7 @@
 	<div class="head-button" title="How To Play" on:click={handleHelpClick}>
 		<span class="material-icons">help</span>
 	</div>
-	<div class="title">HANGLE</div>
+	<div class="title">한:글</div>
 	<div class="right">
 		<div class="head-button" title="Leaderboard" on:click={handleLeaderboardClick}>
 			<span class="material-icons">leaderboard</span>
