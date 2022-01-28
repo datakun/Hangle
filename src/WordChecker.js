@@ -11,7 +11,6 @@ export async function searchWord(word) {
 			},
 		});
 		const json = await response.json();
-		alert(json);
 		console.log(json);
 
 		return json;
