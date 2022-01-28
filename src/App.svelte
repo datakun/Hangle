@@ -2,7 +2,7 @@
 	import Head from './Head.svelte';
 	import Body from './Body.svelte';
 	import Keyboard from './Keyboard.svelte';
-	import { tryIndex, letterBoxCount, totalTryCount } from './GameStore';
+	import { tryIndex, letterBoxCount, totalTryCount } from './store/GameStore';
 	import { onDestroy, onMount } from 'svelte/internal';
 	import { searchWord } from './api/WordChecker';
 
