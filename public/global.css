@@ -49,18 +49,25 @@ body {
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
+	color: white;
 }
 
-div.button.correct {
+.button.key.correct,
+.box.back.correct {
 	background-color: rgb(97, 140, 85);
+	border: solid 2px rgb(97, 140, 85);
 }
 
-div.button.contain {
+.button.key.contain,
+.box.back.contain {
 	background-color: rgb(177, 160, 76);
+	border: solid 2px rgb(177, 160, 76);
 }
 
-div.button.not-contain {
+.button.key.not-contain,
+.box.back.not-contain {
 	background-color: rgb(58, 58, 58);
+	border: solid 2px rgb(58, 58, 58);
 }
 
 /* 애니메이션 */
@@ -73,23 +80,23 @@ div.button.not-contain {
 @keyframes shake {
 	10%,
 	90% {
-		transform: translate3d(-1px, 0, 0);
+		transform: translate(-1px, 0);
 	}
 
 	20%,
 	80% {
-		transform: translate3d(2px, 0, 0);
+		transform: translate(2px, 0);
 	}
 
 	30%,
 	50%,
 	70% {
-		transform: translate3d(-4px, 0, 0);
+		transform: translate(-4px, 0);
 	}
 
 	40%,
 	60% {
-		transform: translate3d(4px, 0, 0);
+		transform: translate(4px, 0);
 	}
 }
 
@@ -99,63 +106,42 @@ div.button.not-contain {
 	position: fixed;
 	left: 50%;
 	transform: translate(-50%);
-	top: 80px;
+	bottom: 80px;
 	padding: 8px;
-	z-index: 1;
+	z-index: 10;
 	text-align: center;
 	border-radius: 4px;
 	font-size: 1em;
 	background-color: #333;
-	color: #fff;
+	white-space: pre;
+	word-break: keep-all;
 }
 
 #snackbar.show {
 	visibility: visible;
-	-moz-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-	-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-	animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@-webkit-keyframes fadein {
-	from {
-		top: 0;
-		opacity: 0;
-	}
-	to {
-		top: 80px;
-		opacity: 1;
-	}
+	-moz-animation: fadein 0.5s, fadeout 0.5s 3s;
+	-webkit-animation: fadein 0.5s, fadeout 0.5s 3s;
+	animation: fadein 0.5s, fadeout 0.5s 3s;
 }
 
 @keyframes fadein {
 	from {
-		top: 0;
+		bottom: 0;
 		opacity: 0;
 	}
 	to {
-		top: 80px;
+		bottom: 80px;
 		opacity: 1;
-	}
-}
-
-@-webkit-keyframes fadeout {
-	from {
-		top: 80px;
-		opacity: 1;
-	}
-	to {
-		top: 0;
-		opacity: 0;
 	}
 }
 
 @keyframes fadeout {
 	from {
-		top: 80px;
+		bottom: 80px;
 		opacity: 1;
 	}
 	to {
-		top: 0;
+		bottom: 0;
 		opacity: 0;
 	}
 }

@@ -5,7 +5,7 @@
 	onMount(() => {
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
 		const screenWidth = window.innerWidth;
-		const width = screenWidth > 480 ? 480 - 60 - 16 : screenWidth - 60 - 16; // min-width - button-margin * 20 - compoent-padding * 2
+		const width = screenWidth > 480 ? 480 - 60 - 16 : screenWidth - 60 - 16; // min-width - button-margin * 20 - component-padding * 2
 		const buttonWidth = width / 10; // 한 줄에 10개의 버튼
 		const buttonHeight = buttonWidth * 1.5; // 버튼의 높이는 너비의 1.5배
 
@@ -42,50 +42,50 @@
 
 <div class="keyboard">
 	<div class="row-container">
-		<div class="button">ㅃ</div>
-		<div class="button">ㅉ</div>
-		<div class="button">ㄸ</div>
-		<div class="button">ㄲ</div>
-		<div class="button">ㅆ</div>
-		<div class="button empty" />
-		<div class="button empty" />
-		<div class="button empty" />
-		<div class="button">ㅒ</div>
-		<div class="button">ㅖ</div>
+		<div class="button key">ㅃ</div>
+		<div class="button key">ㅉ</div>
+		<div class="button key">ㄸ</div>
+		<div class="button key">ㄲ</div>
+		<div class="button key">ㅆ</div>
+		<div class="button key empty" />
+		<div class="button key empty" />
+		<div class="button key empty" />
+		<div class="button key">ㅒ</div>
+		<div class="button key">ㅖ</div>
 	</div>
 	<div class="row-container">
-		<div class="button">ㅂ</div>
-		<div class="button">ㅈ</div>
-		<div class="button">ㄷ</div>
-		<div class="button">ㄱ</div>
-		<div class="button">ㅅ</div>
-		<div class="button">ㅛ</div>
-		<div class="button">ㅕ</div>
-		<div class="button">ㅑ</div>
-		<div class="button">ㅐ</div>
-		<div class="button">ㅔ</div>
+		<div class="button key">ㅂ</div>
+		<div class="button key">ㅈ</div>
+		<div class="button key">ㄷ</div>
+		<div class="button key">ㄱ</div>
+		<div class="button key">ㅅ</div>
+		<div class="button key">ㅛ</div>
+		<div class="button key">ㅕ</div>
+		<div class="button key">ㅑ</div>
+		<div class="button key">ㅐ</div>
+		<div class="button key">ㅔ</div>
 	</div>
 	<div class="row-container">
-		<div class="button">ㅁ</div>
-		<div class="button">ㄴ</div>
-		<div class="button">ㅇ</div>
-		<div class="button">ㄹ</div>
-		<div class="button">ㅎ</div>
-		<div class="button">ㅗ</div>
-		<div class="button">ㅓ</div>
-		<div class="button">ㅏ</div>
-		<div class="button">ㅣ</div>
+		<div class="button key">ㅁ</div>
+		<div class="button key">ㄴ</div>
+		<div class="button key">ㅇ</div>
+		<div class="button key">ㄹ</div>
+		<div class="button key">ㅎ</div>
+		<div class="button key">ㅗ</div>
+		<div class="button key">ㅓ</div>
+		<div class="button key">ㅏ</div>
+		<div class="button key">ㅣ</div>
 	</div>
 	<div class="row-container">
-		<div class="button enter">ENTER</div>
-		<div class="button">ㅋ</div>
-		<div class="button">ㅌ</div>
-		<div class="button">ㅊ</div>
-		<div class="button">ㅍ</div>
-		<div class="button">ㅠ</div>
-		<div class="button">ㅜ</div>
-		<div class="button">ㅡ</div>
-		<div class="button delete">
+		<div class="button key enter">확인</div>
+		<div class="button key">ㅋ</div>
+		<div class="button key">ㅌ</div>
+		<div class="button key">ㅊ</div>
+		<div class="button key">ㅍ</div>
+		<div class="button key">ㅠ</div>
+		<div class="button key">ㅜ</div>
+		<div class="button key">ㅡ</div>
+		<div class="button key delete">
 			<span class="material-icons">backspace</span>
 		</div>
 	</div>
@@ -124,7 +124,7 @@
 	}
 
 	.enter {
-		font-size: 0.8em;
+		font-size: 1em;
 		flex: 1;
 	}
 
