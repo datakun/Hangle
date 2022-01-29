@@ -1,14 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import { gameState } from './store/GameStore';
-	import { LETTER_BOX_COUNT } from './Environment';
+	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH } from './Environment';
 	import Hangul from 'hangul-js';
 
 	let answerList;
 	let answer;
 	let tryIndex;
 
-	let containerWidth = 0;
 	let boxSize = 0;
 
 	gameState.subscribe((value) => {
@@ -19,14 +18,13 @@
 
 	onMount(() => {
 		const screenWidth = window.innerWidth;
-		containerWidth = screenWidth > 480 ? 480 - 60 : screenWidth - 60;
+		const containerWidth = screenWidth > MIN_SCREEN_WIDTH ? MIN_SCREEN_WIDTH - 60 : screenWidth - 60;
 		boxSize = containerWidth / 7;
 	});
 </script>
 
 <div class="body">
 	{#each answerList as _answer, i}
-		<!-- <div id="line-{i}" class="flip-container {tryIndex === i ? 'current' : ''}" style="width: {containerWidth}px"> -->
 		<div id="line-{i}" class="flip-container {tryIndex === i ? 'current' : ''}">
 			{#each new Array(LETTER_BOX_COUNT) as _, j}
 				<div class="flipper" style="width: {boxSize}px; height: {boxSize}px; line-height: {boxSize}px;">
@@ -72,20 +70,16 @@
 		border-bottom: solid 4px rgb(58, 58, 58);
 	}
 
+	.word-container .box {
+		font-size: 2.5em;
+	}
+
 	.box {
 		width: 100%;
 		height: 100%;
 		margin: 2px;
 		display: flex;
 		justify-content: center;
-	}
-
-	.word-container .box {
-		font-size: 2.5em;
-	}
-
-	.flip-container .box {
-		font-size: 2em;
 	}
 
 	.border {
@@ -99,43 +93,8 @@
 		align-self: center;
 	}
 
-	.flipper {
-		margin: 4px;
-
-		position: relative;
-		transform-style: preserve-3d;
-	}
-
-	.flipper .box {
-		position: absolute;
-		backface-visibility: hidden;
-		transition: 0.75s;
-		perspective: 300px;
-	}
-
-	.flipper .box.front {
-		transform: rotateX(0deg);
-
-		z-index: 2;
-	}
-
-	.flipper .box.back {
-		transform: rotateX(180deg);
-	}
-
-	.flipper .box.front.flip {
-		transform: rotateX(180deg);
-	}
-
-	.flipper .box.back.flip {
-		transform: rotateX(0deg);
-	}
-
-	.flipper:hover .box.front {
-		transform: rotateX(180deg);
-	}
-
-	.flipper:hover .box.back {
-		transform: rotateX(0deg);
+	.flip-container .box {
+		font-size: 2em;
+		font-weight: bold;
 	}
 </style>

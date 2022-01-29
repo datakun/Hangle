@@ -11,6 +11,7 @@
 	let answerList;
 	let answer;
 	let tryIndex;
+	let isFinished;
 
 	let snackbarMessage = '';
 
@@ -18,6 +19,7 @@
 		answerList = value.answerList;
 		answer = value.answer;
 		tryIndex = value.tryIndex;
+		isFinished = value.isFinished;
 	});
 
 	onMount(async () => {
@@ -58,6 +60,7 @@
 				answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
 				answer: answer, // 정답
 				updateDate: nowDate, // yyyyMMdd
+				isFinished: false,
 			};
 
 			// 새로 생성된 게임 데이터를 local storage 에 저장한다.
@@ -66,6 +69,18 @@
 
 		// store 저장
 		gameState.set(stateJson);
+
+		// 이전에 입력한 답의 애니메이션 수행
+		let result = false;
+		for (let i = 0; i <= tryIndex; i++) {
+			if (answerList[i] !== '') {
+				result = validateAnswer(i);
+			}
+		}
+
+		if (tryIndex >= TOTAL_TRY_COUNT - 1 && result === false) {
+			showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+		}
 	});
 
 	onDestroy(() => {
@@ -104,8 +119,66 @@
 		});
 	};
 
+	/**
+	 * 추측 가능 횟수 내에 정답을 맞추면 true 를 반환한다.
+	 * @param {number} index
+	 * @returns {boolean}
+	 */
+	const validateAnswer = (index) => {
+		// 단어 검증
+		const currentAnswer = answerList[index];
+		if (currentAnswer.length !== LETTER_BOX_COUNT) {
+			runShakeAnimation(index);
+
+			throw new Error('글자 수가 부족합니다.');
+		}
+
+		// const word = Hangul.a(currentAnswer);
+		// const result = await searchWord(word);
+		// if (result === null) {
+		// 	// TODO: 사전에서 단어 검색. 특정 시간 동안 단어 시도할 수 있는 횟수를 제한한다.
+		// 	runShakeAnimation($gameState.tryIndex);
+		// 	showSnackbar('올바른 단어를 입력하세요.');
+
+		// 	return;
+		// }
+
+		const validateResult = new Array(currentAnswer.length);
+		const correctLetters = Hangul.d(answer);
+		for (let i = 0; i < currentAnswer.length; i++) {
+			if (currentAnswer[i] === correctLetters[i]) {
+				// correct
+				validateResult[i] = 'correct';
+			} else if (correctLetters.includes(currentAnswer[i])) {
+				// contain
+				validateResult[i] = 'contain';
+			} else {
+				// 그 외에는 not-contain
+				validateResult[i] = 'not-contain';
+			}
+		}
+
+		const lineIndex = index;
+		let letterIndex = 0;
+		const intervalId = setInterval(() => {
+			runFlipAnimation(lineIndex, letterIndex, validateResult[letterIndex]);
+
+			letterIndex++;
+
+			if (letterIndex === LETTER_BOX_COUNT) {
+				clearInterval(intervalId);
+			}
+		}, 300);
+
+		if (validateResult.every((data) => data === 'correct')) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
 	const handleKeyInsert = async (e) => {
-		if (tryIndex >= TOTAL_TRY_COUNT) {
+		if (tryIndex >= TOTAL_TRY_COUNT || isFinished === true) {
 			// 시도 횟수를 초과하면 이벤트 처리 안 함
 			return;
 		}
@@ -138,67 +211,32 @@
 				});
 			}
 		} else if (character === 'enter') {
-			// 단어 검증
-			const currentAnswer = answerList[tryIndex];
-			if (currentAnswer.length !== LETTER_BOX_COUNT) {
-				runShakeAnimation(tryIndex);
-				showSnackbar('글자 수가 부족합니다.');
-
-				return;
-			}
-
-			// const word = Hangul.a(currentAnswer);
-			// const result = await searchWord(word);
-			// if (result === null) {
-			// 	// TODO: 사전에서 단어 검색. 특정 시간 동안 단어 시도할 수 있는 횟수를 제한한다.
-			// 	runShakeAnimation($gameState.tryIndex);
-			// 	showSnackbar('올바른 단어를 입력하세요.');
-
-			// 	return;
-			// }
-
-			const validateResult = new Array(currentAnswer.length);
-			const correctLetters = Hangul.d(answer);
-			for (let i = 0; i < currentAnswer.length; i++) {
-				if (currentAnswer[i] === correctLetters[i]) {
-					// correct
-					validateResult[i] = 'correct';
-				} else if (correctLetters.includes(currentAnswer[i])) {
-					// contain
-					validateResult[i] = 'contain';
-				} else {
-					// 그 외에는 not-contain
-					validateResult[i] = 'not-contain';
-				}
-			}
-
-			const lineIndex = tryIndex;
-			let letterIndex = 0;
-			const intervalId = setInterval(() => {
-				runFlipAnimation(lineIndex, letterIndex, validateResult[letterIndex]);
-
-				letterIndex++;
-
-				if (letterIndex === LETTER_BOX_COUNT) {
-					clearInterval(intervalId);
-				}
-			}, 300);
-
-			if (tryIndex < TOTAL_TRY_COUNT) {
-				if (validateResult.every((data) => data === 'correct')) {
-					// 추측 가능 횟수 내에 정답을 맞추면 게임 종료
+			let result = false;
+			try {
+				// 정답 검증
+				result = validateAnswer(tryIndex);
+				if (result === true) {
 					showSnackbar('정답입니다.');
 				} else {
-					// 정답을 못 맞추면 try index 증가
-					gameState.set({
-						...$gameState,
-						tryIndex: tryIndex + 1,
-					});
+					if (tryIndex >= TOTAL_TRY_COUNT - 1) {
+						// 추측 가능 횟수를 모두 사용하면 정답을 알려주고 게임 종료
+						tryIndex = TOTAL_TRY_COUNT - 1;
+
+						result = true;
+						showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+					} else {
+						tryIndex = tryIndex + 1;
+					}
 				}
-			} else {
-				// 추측 가능 횟수를 모두 사용하면 정답을 알려주고 게임 종료
-				showSnackbar(`${$gameState.answer}\n[${correctLetters.join(',')}]`);
+			} catch (error) {
+				showSnackbar(error.message);
 			}
+
+			gameState.set({
+				...$gameState,
+				tryIndex: tryIndex >= TOTAL_TRY_COUNT ? TOTAL_TRY_COUNT - 1 : tryIndex,
+				isFinished: result,
+			});
 
 			// 한 단어를 삽입 후 local storage 에 gameState 저장
 			const stateJson = JSON.stringify($gameState);

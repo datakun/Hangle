@@ -6,4 +6,5 @@ export const gameState = writable({
 	answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
 	answer: '', // 정답
 	updateDate: '', // yyyyMMdd
+	isFinished: false,
 });

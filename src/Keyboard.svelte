@@ -1,11 +1,12 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { MIN_SCREEN_WIDTH } from './Environment';
 
 	onMount(() => {
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
 		const screenWidth = window.innerWidth;
-		const width = screenWidth > 480 ? 480 - 60 - 16 : screenWidth - 60 - 16; // min-width - button-margin * 20 - component-padding * 2
+		const width = screenWidth > MIN_SCREEN_WIDTH ? MIN_SCREEN_WIDTH - 60 - 16 : screenWidth - 60 - 16; // min-width - button-margin * 20 - component-padding * 2
 		const buttonWidth = width / 10; // 한 줄에 10개의 버튼
 		const buttonHeight = buttonWidth * 1.5; // 버튼의 높이는 너비의 1.5배
 
