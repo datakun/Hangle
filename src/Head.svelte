@@ -138,7 +138,7 @@
 
 			// 공유용 메시지 생성
 			const correctLetters = Hangul.d(todayGameState.answer);
-			shareText = `한:글 ${isCorrect === true ? todayTryIndex + 1 : 'X'}/${TOTAL_TRY_COUNT}`;
+			shareText = `한:글 ${isCorrect === true ? todayTryIndex + 1 : 'X'}/${TOTAL_TRY_COUNT}\n`;
 			for (let i = 0; i <= todayTryIndex; i++) {
 				const currentAnswer = todayGameState.answerList[i];
 				const validateResult = new Array(currentAnswer.length);
