@@ -8,3 +8,5 @@ export const gameState = writable({
 	updateDate: '', // yyyyMMdd
 	isFinished: false,
 });
+
+export const snackbarMessage = writable('');

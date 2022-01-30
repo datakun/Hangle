@@ -1,3 +1,5 @@
+import { snackbarMessage } from './store/GameStore';
+
 /**
  * duration 동안 draw 애니메이션을 timing 규칙에 따라 실행함.
  * @param {Function} timing
@@ -22,4 +24,14 @@ export function animate(timing, draw, duration) {
 			requestAnimationFrame(animate);
 		}
 	});
+}
+
+export function showSnackbar(message) {
+	snackbarMessage.set(message);
+
+	const snackbar = document.getElementById('snackbar');
+	snackbar.className = 'show';
+	setTimeout(function () {
+		snackbar.className = snackbar.className.replace('show', '');
+	}, 3500);
 }

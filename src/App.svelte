@@ -2,39 +2,36 @@
 	import Head from './Head.svelte';
 	import Body from './Body.svelte';
 	import Keyboard from './Keyboard.svelte';
-	import { gameState } from './store/GameStore';
+	import { gameState, snackbarMessage } from './store/GameStore';
 	import Hangul from 'hangul-js';
 	import { onDestroy, onMount } from 'svelte/internal';
 	import { getLetters, searchWord } from './api/SearchApi';
 	import { LETTER_BOX_COUNT, TOTAL_TRY_COUNT } from './Environment';
+	import { showSnackbar } from './Utils';
 
-	let answerList;
+	let answerList = ['', '', '', '', '', ''];
 	let answer;
 	let tryIndex;
 	let isFinished;
 
 	let totalGameState = {};
 
-	let snackbarMessage = '';
-
+	const now = new Date();
+	const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
 	gameState.subscribe(async (value) => {
-		answerList = value.answerList;
 		answer = value.answer;
 		tryIndex = value.tryIndex;
 		isFinished = value.isFinished;
+
+		totalGameState = {
+			...totalGameState,
+			[nowDate]: value,
+		};
 	});
 
 	onMount(async () => {
-		// 애니메이션 종료 후 클래스를 제거하기 위해 이벤트 등록
-		for (let i = 0; i < TOTAL_TRY_COUNT; i++) {
-			const rowContainer = document.getElementById(`line-${i}`);
-			rowContainer.addEventListener('animationend', handleShakeAnimationEnd, false);
-		}
-
 		// local storage 에서 게임 상태 가져오기
 		// answerList, answer, tryIndex, isFinished;
-		const now = new Date();
-		const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
 		let needInitialize = false;
 		let state = localStorage.getItem('Hangle_gameState');
 		let stateJson = {};
@@ -45,6 +42,15 @@
 			if (stateJson[nowDate] === undefined) {
 				// 지금 날짜의 게임 데이터가 없으면 새로 생성하기
 				needInitialize = true;
+
+				// 만약 이전 날짜 게임 데이터가 있으면 모두 종료상태로 변경
+				const updateDateList = Object.keys(stateJson);
+				for (let i = 0; i < updateDateList.length; i++) {
+					const updateDate = updateDateList[i];
+					if (updateDate < nowDate) {
+						stateJson[updateDate].isFinished = true;
+					}
+				}
 			}
 		} else {
 			// 저장된 게임 데이터가 없다면 새로 생성하기
@@ -70,13 +76,20 @@
 			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 		}
 
+		answerList = stateJson[nowDate].answerList;
+
 		totalGameState = stateJson;
 
 		// store 저장
 		gameState.set(stateJson[nowDate]);
 
-		// 이전에 입력한 답의 애니메이션 수행
+		// 애니메이션 종료 후 클래스를 제거하기 위해 이벤트 등록
+		for (let i = 0; i < TOTAL_TRY_COUNT; i++) {
+			const rowContainer = document.getElementById(`line-${i}`);
+			rowContainer?.addEventListener('animationend', handleShakeAnimationEnd, false);
+		}
 
+		// 이전에 입력한 답의 애니메이션 수행
 		try {
 			let result = false;
 			for (let i = 0; i <= tryIndex; i++) {
@@ -110,15 +123,6 @@
 		if (e.type === 'animationend') {
 			e.target.classList.remove('shake');
 		}
-	};
-
-	const showSnackbar = (message, timeout = 3000) => {
-		snackbarMessage = message;
-		const snackbar = document.getElementById('snackbar');
-		snackbar.className = 'show';
-		setTimeout(function () {
-			snackbar.className = snackbar.className.replace('show', '');
-		}, 3500);
 	};
 
 	const runFlipAnimation = (lineIndex, letterIndex, state) => {
@@ -202,10 +206,7 @@
 					currentAnswer += character;
 					const newAnswerList = [...answerList];
 					newAnswerList[tryIndex] = currentAnswer;
-					gameState.set({
-						...$gameState,
-						answerList: newAnswerList,
-					});
+					answerList = newAnswerList;
 				}
 			}
 		} else if (character === 'backspace' || character === 'delete') {
@@ -215,10 +216,7 @@
 				currentAnswer = currentAnswer.substring(0, currentAnswer.length - 1);
 				const newAnswerList = [...answerList];
 				newAnswerList[tryIndex] = currentAnswer;
-				gameState.set({
-					...$gameState,
-					answerList: newAnswerList,
-				});
+				answerList = newAnswerList;
 			}
 		} else if (character === 'enter') {
 			let result = false;
@@ -233,43 +231,43 @@
 						tryIndex = TOTAL_TRY_COUNT - 1;
 
 						result = true;
+
 						showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
 					} else {
 						tryIndex = tryIndex + 1;
 					}
 				}
+
+				const newState = {
+					...$gameState,
+					answerList: answerList,
+					tryIndex: tryIndex >= TOTAL_TRY_COUNT ? TOTAL_TRY_COUNT - 1 : tryIndex,
+					isFinished: result,
+				};
+				gameState.set(newState);
+
+				// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
+				let state = localStorage.getItem('Hangle_gameState');
+				let stateJson = JSON.parse(state);
+				stateJson = {
+					...stateJson,
+					[nowDate]: newState,
+				};
+
+				// local storage 에 gameState 저장
+				localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 			} catch (error) {
 				showSnackbar(error.message);
 			}
-
-			const newState = {
-				...$gameState,
-				tryIndex: tryIndex >= TOTAL_TRY_COUNT ? TOTAL_TRY_COUNT - 1 : tryIndex,
-				isFinished: result,
-			};
-			gameState.set(newState);
-
-			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
-			const now = new Date();
-			const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
-			let state = localStorage.getItem('Hangle_gameState');
-			let stateJson = JSON.parse(state);
-			stateJson = {
-				...stateJson,
-				[nowDate]: newState,
-			};
-
-			// local storage 에 gameState 저장
-			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 		}
 	};
 </script>
 
 <main>
 	<Head {totalGameState} />
-	<Body />
+	<Body {answerList} />
 	<Keyboard on:keyInsert={handleKeyInsert} />
-	<div id="snackbar">{snackbarMessage}</div>
+	<div id="snackbar">{$snackbarMessage}</div>
 </main>
 
 <style>

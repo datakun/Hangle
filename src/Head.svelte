@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte/internal';
 	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH, TOTAL_TRY_COUNT } from './Environment';
-	import { animate } from './Utils';
+	import { animate, showSnackbar } from './Utils';
 	import Hangul from 'hangul-js';
 	import Switch from './Switch.svelte';
 
@@ -14,13 +14,19 @@
 	let distribution = [0, 0, 0, 0, 0, 0];
 	let distributionMode = 0;
 	let todayTryIndex = -1;
+	let isCorrect = false;
 	let remainTime = '';
 
 	let hardMode = false;
 	let darkMode = true;
 	let colorBlindMode = false;
 
+	let shareText = '';
+
 	let boxSize = 0;
+
+	const now = new Date();
+	const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
 
 	let settings = localStorage.getItem('Hangle_settings');
 	let settingsJson = {};
@@ -40,6 +46,11 @@
 
 		// 설정 데이터 저장
 		localStorage.setItem('Hangle_settings', JSON.stringify(settingsJson));
+
+		// 사이트에 처음 접속했다면 help 화면 보여주기
+		setTimeout(() => {
+			handleHelpClick();
+		}, 1000);
 	}
 
 	$: {
@@ -96,7 +107,7 @@
 	$: {
 		const updateDateList = Object.keys(totalGameState);
 		// 게임 횟수
-		played = updateDateList.length;
+		played = updateDateList.filter((date) => totalGameState[date].isFinished === true).length;
 		// 승리 횟수
 		winCount = 0;
 		// 현재 연승 횟수
@@ -105,11 +116,39 @@
 		maxStreak = 0;
 
 		// 오늘 시도한 횟수 계산
-		const now = new Date();
-		const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
-		if (totalGameState[nowDate] !== undefined) {
-			if (totalGameState[nowDate].isFinished === true && Hangul.a(totalGameState[nowDate].answerList[totalGameState[nowDate].tryIndex]) === totalGameState[nowDate].answer) {
-				todayTryIndex = totalGameState[nowDate].tryIndex;
+		const todayGameState = totalGameState[nowDate];
+		if (todayGameState !== undefined) {
+			todayTryIndex = todayGameState.tryIndex;
+
+			if (todayGameState.isFinished === true && Hangul.a(todayGameState.answerList[todayGameState.tryIndex]) === todayGameState.answer) {
+				isCorrect = true;
+			} else {
+				isCorrect = false;
+			}
+
+			// 공유용 메시지 생성
+			const correctLetters = Hangul.d(todayGameState.answer);
+			shareText = `한:글 ${isCorrect === true ? todayTryIndex + 1 : 'X'}/${TOTAL_TRY_COUNT}`;
+			for (let i = 0; i <= todayTryIndex; i++) {
+				const currentAnswer = todayGameState.answerList[i];
+				const validateResult = new Array(currentAnswer.length);
+				for (let i = 0; i < currentAnswer.length; i++) {
+					if (currentAnswer[i] === correctLetters[i]) {
+						// correct
+						validateResult[i] = '🟩';
+					} else if (correctLetters.includes(currentAnswer[i])) {
+						// contain
+						validateResult[i] = '🟨';
+					} else {
+						// 그 외에는 not-contain
+						validateResult[i] = '⬛';
+					}
+				}
+
+				shareText += `\n`;
+				for (let j = 0; j < validateResult.length; j++) {
+					shareText += `${validateResult[j]}`;
+				}
 			}
 		}
 
@@ -198,7 +237,21 @@
 	};
 
 	const handleShareClick = () => {
-		// TODO:
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(shareText).then(() => {
+				showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+			});
+		} else {
+			const tempElem = document.createElement('textarea');
+			tempElem.value = shareText;
+			document.body.appendChild(tempElem);
+
+			tempElem.select();
+			document.execCommand('copy');
+			document.body.removeChild(tempElem);
+
+			showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+		}
 	};
 
 	const handleSettingsClick = () => {
@@ -346,34 +399,37 @@
 			</div>
 		</div>
 		<div class="title">추측 성공 분포</div>
-		<div style="padding: 16px; padding-left: 32px; padding-right: 32px; display: flex; flex-direction: column; justify-content: center;">
-			{#each distribution as item, i}
-				<div style="display: flex; margin: 3px; height: 20px; line-height: 16px;">
-					{i}
-					<div
-						class="bar"
-						style="background-color: {todayTryIndex >= 0 && todayTryIndex === i ? 'rgb(97, 140, 85)' : 'rgb(58, 58, 58)'}; width: {item === 0
-							? '4'
-							: (item / distributionMode) * 100}%; "
-						on:click={handleShareClick}
-					>
-						{item}
+		{#if played > 0}
+			<div style="padding: 16px; padding-left: 32px; padding-right: 32px; display: flex; flex-direction: column; justify-content: center;">
+				{#each distribution as item, i}
+					<div style="display: flex; margin: 3px; height: 20px; line-height: 16px;">
+						{i}
+						<div
+							class="bar"
+							style="background-color: {isCorrect === true && todayTryIndex === i ? 'rgb(97, 140, 85)' : 'rgb(58, 58, 58)'}; width: {item === 0
+								? '4'
+								: (item / distributionMode) * 100}%; "
+						>
+							{item}
+						</div>
+					</div>
+				{/each}
+			</div>
+			<div style="display: flex; justify-content: center;">
+				<div class="bottom-container">
+					<div style="font-size: 1.25em; width: 140px;">다음 한:글</div>
+					<div style="font-size: 2em; width: 140px;">{remainTime}</div>
+				</div>
+				<hr class="vertical" style="height: 80px;" />
+				<div class="bottom-container">
+					<div class="share-button" style="width: 120px; cursor: pointer;" on:click={handleShareClick}>
+						공유 <span class="material-icons" style="font-size: 20px;">share</span>
 					</div>
 				</div>
-			{/each}
-		</div>
-		<div style="display: flex; justify-content: center;">
-			<div class="bottom-container">
-				<div style="font-size: 1.25em; width: 140px;">다음 한:글</div>
-				<div style="font-size: 2em; width: 140px;">{remainTime}</div>
 			</div>
-			<hr class="vertical" style="height: 80px;" />
-			<div class="bottom-container">
-				<div class="share-button" style="width: 120px;">
-					공유 <span class="material-icons" style="font-size: 20px;">share</span>
-				</div>
-			</div>
-		</div>
+		{:else}
+			<p style="text-align: center;">데이터 없음.</p>
+		{/if}
 	</div>
 </div>
 <div class="settings head-container">
@@ -574,6 +630,11 @@
 		font-weight: 700;
 		padding: 10px;
 		border-radius: 4px;
+
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		user-select: none;
 
 		color: white;
 	}

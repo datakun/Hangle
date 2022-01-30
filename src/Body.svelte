@@ -4,14 +4,13 @@
 	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH } from './Environment';
 	import Hangul from 'hangul-js';
 
-	let answerList;
+	export let answerList = ['', '', '', '', '', ''];
 	let answer;
 	let tryIndex;
 
 	let boxSize = 0;
 
 	gameState.subscribe((value) => {
-		answerList = value.answerList;
 		answer = value.answer;
 		tryIndex = value.tryIndex;
 	});

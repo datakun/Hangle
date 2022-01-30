@@ -5,7 +5,7 @@
 	import { MIN_SCREEN_WIDTH } from './Environment';
 	import Hangul from 'hangul-js';
 
-	let answerList;
+	let answerList = ['', '', '', '', '', ''];
 	let answer;
 
 	const updateKeyButtons = () => {
