@@ -67,7 +67,6 @@
 	.underline {
 		margin-left: 4px !important;
 		margin-right: 4px !important;
-		border-bottom: solid 4px rgb(58, 58, 58);
 	}
 
 	.word-container .box {
@@ -80,10 +79,15 @@
 		margin: 2px;
 		display: flex;
 		justify-content: center;
+
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 
 	.border {
-		border: solid 2px rgb(58, 58, 58);
+		border: rgb(22, 18, 18) d 2px rgb(58, 58, 58);
 	}
 
 	.flip-container {

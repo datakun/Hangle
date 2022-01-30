@@ -1,7 +1,54 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
+	import { gameState } from './store/GameStore';
 	import { MIN_SCREEN_WIDTH } from './Environment';
+	import Hangul from 'hangul-js';
+
+	let answerList;
+	let answer;
+
+	const updateKeyButtons = () => {
+		const keyboard = document.querySelector('.keyboard');
+		if (!keyboard) {
+			return;
+		}
+
+		const disassembledAnswer = Hangul.d(answer);
+		for (const button of keyboard.querySelectorAll('.button.key')) {
+			if (button.innerText.length > 1) {
+				continue;
+			}
+
+			for (const _answer of answerList) {
+				const index = _answer.indexOf(button.innerText);
+				if (index === -1) {
+					continue;
+				}
+
+				if (disassembledAnswer[index] === button.innerText) {
+					button.classList.add('correct');
+
+					break;
+				} else if (disassembledAnswer.includes(button.innerText)) {
+					button.classList.add('contain');
+
+					break;
+				} else {
+					button.classList.add('not-contain');
+
+					break;
+				}
+			}
+		}
+	};
+
+	gameState.subscribe((value) => {
+		answerList = value.answerList;
+		answer = value.answer;
+
+		updateKeyButtons();
+	});
 
 	onMount(() => {
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
@@ -20,6 +67,8 @@
 		}
 
 		document.addEventListener('keydown', handleKeyInput);
+
+		updateKeyButtons();
 	});
 
 	onDestroy(() => {
@@ -94,30 +143,35 @@
 
 <style>
 	.keyboard {
-		background-color: #0e0e0e;
 		flex: 0 1;
 		padding: 8px;
 	}
 
-	.row-container {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-	}
-
-	.button {
+	.keyboard .button {
 		display: flex;
 		flex-direction: column;
 		justify-items: center;
 		align-items: center;
 		margin: 3px;
 		border-radius: 4px;
-		color: rgb(220, 220, 220);
-		background-color: rgb(130, 130, 130);
 		font-weight: 700;
 		font-size: 1.35em;
 		cursor: pointer;
 		text-align: center;
+
+		-ms-user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		user-select: none;
+
+		background-color: rgb(220, 220, 220);
+		color: black;
+	}
+
+	.row-container {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
 	}
 
 	.empty {

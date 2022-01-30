@@ -1,73 +1,177 @@
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 100;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.otf) format('opentype');
-}
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 300;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.otf) format('opentype');
-}
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 400;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.otf) format('opentype');
-}
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 500;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.otf) format('opentype');
-}
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 700;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.otf) format('opentype');
-}
-@font-face {
-	font-family: 'Noto Sans KR';
-	font-style: normal;
-	font-weight: 900;
-	src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff2) format('woff2'), url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff) format('woff'),
-		url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.otf) format('opentype');
+:root {
+	--gray: rgb(58, 58, 58);
+
+	--light-bg-color: white;
+	--light-color: rgb(18, 18, 18);
+	--light-gray: rgb(220, 220, 220);
+
+	--dark-bg-color: rgb(18, 18, 18);
+	--dark-color: white;
+	--dark-gray: rgb(130, 130, 130);
+
+	--normal-correct: rgb(107, 170, 100);
+	--normal-contain: rgb(202, 180, 88);
+	--normal-not-contain: rgb(58, 58, 58);
+
+	--color-blind-correct: rgb(245, 121, 58);
+	--color-blind-contain: rgb(133, 192, 249);
+	--color-blind-not-contain: rgb(58, 58, 58);
 }
 
+/* 라이트 테마 */
 body {
 	margin: 0px;
-	background-color: rgb(18, 18, 18);
 	font-family: 'Noto Sans KR', sans-serif;
-	-ms-user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	user-select: none;
+
+	background-color: var(--light-bg-color);
+	color: var(--light-color);
+}
+
+.head-container {
+	background-color: var(--light-bg-color);
+}
+
+.body .box {
+	border: solid 2px var(--light-gray);
+}
+
+.box:not(.correct):not(.contain):not(.not-contain) {
+	color: var(--light-color);
+}
+
+.word-container .box.underline {
+	color: var(--light-color);
+	border-bottom: solid 4px var(--light-color);
+}
+
+#snackbar {
+	background-color: var(--gray);
 	color: white;
 }
 
-.button.key.correct,
-.box.back.correct {
-	background-color: rgb(97, 140, 85);
-	border: solid 2px rgb(97, 140, 85) !important;
+/* 다크 테마 */
+body.dark-mode {
+	background-color: var(--dark-bg-color);
+	color: var(--dark-color);
 }
 
-.button.key.contain,
-.box.back.contain {
-	background-color: rgb(177, 160, 76);
-	border: solid 2px rgb(177, 160, 76) !important;
+body.dark-mode .head-container {
+	background-color: var(--dark-bg-color);
 }
 
-.button.key.not-contain,
-.box.back.not-contain {
-	background-color: rgb(58, 58, 58);
-	border: solid 2px rgb(58, 58, 58) !important;
+body.dark-mode .button {
+	background-color: var(--dark-gray) !important;
+}
+
+body.dark-mode .word-container .box.underline {
+	color: var(--dark-color);
+	border-bottom: solid 4px var(--dark-color);
+}
+
+body.dark-mode #snackbar {
+	background-color: var(--gray);
+	color: white;
+}
+
+body.dark-mode .button,
+body.dark-mode .box:not(.underline) {
+	color: white !important;
+}
+
+body.dark-mode .box:not(.underline) {
+	border: solid 2px var(--gray);
+}
+
+/* 일반 모드 */
+body:not(.color-blind-mode) .button.key.correct,
+body:not(.color-blind-mode) .box.back.correct {
+	background-color: var(--normal-correct) !important;
+
+	color: white !important;
+}
+
+body:not(.color-blind-mode) .box.back.correct {
+	border: solid 2px var(--normal-correct) !important;
+}
+
+body:not(.color-blind-mode) .button.key.contain,
+body:not(.color-blind-mode) .box.back.contain {
+	background-color: var(--normal-contain) !important;
+
+	color: white !important;
+}
+
+body:not(.color-blind-mode) .box.back.contain {
+	border: solid 2px var(--normal-contain) !important;
+}
+
+body:not(.color-blind-mode) .button.key.not-contain,
+body:not(.color-blind-mode) .box.back.not-contain {
+	background-color: var(--normal-not-contain) !important;
+
+	color: white !important;
+}
+
+body:not(.color-blind-mode) .box.back.not-contain {
+	border: solid 2px var(--normal-not-contain) !important;
+}
+
+body:not(.color-blind-mode) input:checked + .slider {
+	background-color: var(--normal-correct);
+}
+
+body:not(.color-blind-mode) input:checked + .slider {
+	box-shadow: 0 0 1px var(--normal-correct);
+}
+
+body:not(.color-blind-mode) .share-button {
+	background-color: var(--normal-correct);
+}
+
+/* 색약 모드 */
+body.color-blind-mode .button.key.correct,
+body.color-blind-mode .box.back.correct {
+	background-color: var(--color-blind-correct) !important;
+
+	color: white !important;
+}
+
+body.color-blind-mode .box.back.correct {
+	border: solid 2px var(--color-blind-correct) !important;
+}
+
+body.color-blind-mode .button.key.contain,
+body.color-blind-mode .box.back.contain {
+	background-color: var(--color-blind-contain) !important;
+
+	color: white !important;
+}
+
+body.color-blind-mode .box.back.contain {
+	border: solid 2px var(--color-blind-contain) !important;
+}
+
+body.color-blind-mode .button.key.not-contain,
+body.color-blind-mode .box.back.not-contain {
+	background-color: var(--color-blind-not-contain) !important;
+
+	color: white !important;
+}
+
+body.color-blind-mode .box.back.not-contain {
+	border: solid 2px var(--color-blind-not-contain) !important;
+}
+
+body.color-blind-mode input:checked + .slider {
+	background-color: var(--color-blind-correct) !important;
+}
+
+body.color-blind-mode input:checked + .slider {
+	box-shadow: 0 0 1px var(--color-blind-correct) !important;
+}
+
+body.color-blind-mode .share-button {
+	background-color: var(--color-blind-correct) !important;
 }
 
 /* 애니메이션 */
@@ -156,7 +260,6 @@ body {
 	text-align: center;
 	border-radius: 4px;
 	font-size: 1em;
-	background-color: #333;
 	white-space: pre;
 	word-break: keep-all;
 }

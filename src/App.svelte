@@ -13,6 +13,8 @@
 	let tryIndex;
 	let isFinished;
 
+	let totalGameState = {};
+
 	let snackbarMessage = '';
 
 	gameState.subscribe(async (value) => {
@@ -30,7 +32,7 @@
 		}
 
 		// local storage 에서 게임 상태 가져오기
-		// answerList, answer, tryIndex, updateDate;
+		// answerList, answer, tryIndex, isFinished;
 		const now = new Date();
 		const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
 		let needInitialize = false;
@@ -40,9 +42,8 @@
 			// 저장된 게임 데이터가 있으면 가져오기
 			stateJson = JSON.parse(state);
 
-			const updateDate = stateJson.updateDate;
-			if (nowDate !== updateDate) {
-				// 지금 날짜와 저장된 날짜가 다르면 새로 생성하기
+			if (stateJson[nowDate] === undefined) {
+				// 지금 날짜의 게임 데이터가 없으면 새로 생성하기
 				needInitialize = true;
 			}
 		} else {
@@ -56,30 +57,39 @@
 			const answer = Hangul.a(correctAnswer);
 
 			stateJson = {
-				tryIndex: 0, // 0 ~ 6. 6 은 실패를 의미한다.
-				answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
-				answer: answer, // 정답
-				updateDate: nowDate, // yyyyMMdd
-				isFinished: false,
+				...stateJson,
+				[nowDate]: {
+					tryIndex: 0, // 0 ~ 6. 6 은 실패를 의미한다.
+					answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
+					answer: answer, // 정답
+					isFinished: false,
+				},
 			};
 
 			// 새로 생성된 게임 데이터를 local storage 에 저장한다.
 			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 		}
 
+		totalGameState = stateJson;
+
 		// store 저장
-		gameState.set(stateJson);
+		gameState.set(stateJson[nowDate]);
 
 		// 이전에 입력한 답의 애니메이션 수행
-		let result = false;
-		for (let i = 0; i <= tryIndex; i++) {
-			if (answerList[i] !== '') {
-				result = validateAnswer(i);
-			}
-		}
 
-		if (tryIndex >= TOTAL_TRY_COUNT - 1 && result === false) {
-			showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+		try {
+			let result = false;
+			for (let i = 0; i <= tryIndex; i++) {
+				if (answerList[i] !== '' && answerList[i].length === LETTER_BOX_COUNT) {
+					result = validateAnswer(i);
+				}
+			}
+
+			if (tryIndex >= TOTAL_TRY_COUNT - 1 && result === false) {
+				showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+			}
+		} catch (error) {
+			showSnackbar(error.message);
 		}
 	});
 
@@ -232,21 +242,31 @@
 				showSnackbar(error.message);
 			}
 
-			gameState.set({
+			const newState = {
 				...$gameState,
 				tryIndex: tryIndex >= TOTAL_TRY_COUNT ? TOTAL_TRY_COUNT - 1 : tryIndex,
 				isFinished: result,
-			});
+			};
+			gameState.set(newState);
 
-			// 한 단어를 삽입 후 local storage 에 gameState 저장
-			const stateJson = JSON.stringify($gameState);
-			localStorage.setItem('Hangle_gameState', stateJson);
+			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
+			const now = new Date();
+			const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
+			let state = localStorage.getItem('Hangle_gameState');
+			let stateJson = JSON.parse(state);
+			stateJson = {
+				...stateJson,
+				[nowDate]: newState,
+			};
+
+			// local storage 에 gameState 저장
+			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 		}
 	};
 </script>
 
 <main>
-	<Head />
+	<Head {totalGameState} />
 	<Body />
 	<Keyboard on:keyInsert={handleKeyInsert} />
 	<div id="snackbar">{snackbarMessage}</div>
