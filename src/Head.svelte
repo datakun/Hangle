@@ -44,6 +44,16 @@
 			colorBlindMode: false,
 		};
 
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			settingsJson.darkMode = true;
+		} else {
+			settingsJson.darkMode = false;
+		}
+
+		hardMode = settingsJson.hardMode;
+		darkMode = settingsJson.darkMode;
+		colorBlindMode = settingsJson.colorBlindMode;
+
 		// 설정 데이터 저장
 		localStorage.setItem('Hangle_settings', JSON.stringify(settingsJson));
 
@@ -415,18 +425,20 @@
 					</div>
 				{/each}
 			</div>
-			<div style="display: flex; justify-content: center;">
-				<div class="bottom-container">
-					<div style="font-size: 1.25em; width: 140px;">다음 한:글</div>
-					<div style="font-size: 2em; width: 140px;">{remainTime}</div>
-				</div>
-				<hr class="vertical" style="height: 80px;" />
-				<div class="bottom-container">
-					<div class="share-button" style="width: 120px; cursor: pointer;" on:click={handleShareClick}>
-						공유 <span class="material-icons" style="font-size: 20px;">share</span>
+			{#if totalGameState[nowDate].isFinished === true}
+				<div style="display: flex; justify-content: center;">
+					<div class="bottom-container">
+						<div style="font-size: 1.25em; width: 140px;">다음 한:글</div>
+						<div style="font-size: 2em; width: 140px;">{remainTime}</div>
+					</div>
+					<hr class="vertical" style="height: 80px;" />
+					<div class="bottom-container">
+						<div class="share-button" style="width: 120px; cursor: pointer;" on:click={handleShareClick}>
+							공유 <span class="material-icons" style="font-size: 20px;">share</span>
+						</div>
 					</div>
 				</div>
-			</div>
+			{/if}
 		{:else}
 			<p style="text-align: center;">데이터 없음.</p>
 		{/if}

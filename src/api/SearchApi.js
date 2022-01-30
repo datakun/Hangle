@@ -58,7 +58,30 @@ export async function validateLetters(letters) {
 	return result;
 }
 
+/**
+ * 단어의 형태소를 문자열 배열로 반환한다.
+ * @returns {string[]}
+ */
 export async function getLetters() {
-	const correctAnswer = '양말';
-	return Hangul.d(correctAnswer);
+	return Hangul.d('양말');
+	// try {
+	// 	const url = `https://localhost:1337/api/words/1`;
+
+	// 	// fetch get request
+	// 	const response = await fetch(encodeURI(url), {
+	// 		method: 'GET',
+	// 	});
+	// 	if (response.status === 200) {
+	// 		const json = await response.json();
+	// 		console.log(json);
+
+	// 		return json;
+	// 	} else {
+	// 		throw new Error(response.statusText);
+	// 	}
+	// } catch (error) {
+	// 	console.error(error);
+	// }
+
+	// return null;
 }
