@@ -225,7 +225,7 @@
 				newAnswerList[tryIndex] = currentAnswer;
 				answerList = newAnswerList;
 			}
-		} else if (character === '확인') {
+		} else if (character === 'enter' || character === '확인') {
 			let result = false;
 			try {
 				// 정답 검증
