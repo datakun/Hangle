@@ -247,7 +247,7 @@
 				const shareData = {
 					// title: '한:글',
 					text: shareText,
-					url: 'https://hangul.vercel.app/',
+					url: 'https://hangle.vercel.app/',
 				};
 				navigator.share(shareData).then(() => {
 					showSnackbar('문제 풀이 결과를 공유합니다.');
