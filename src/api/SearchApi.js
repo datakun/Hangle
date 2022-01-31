@@ -1,29 +1,29 @@
 import Hangul from 'hangul-js';
+import { getDatabase, ref, onValue, get, child, Database } from 'firebase/database';
+import { FIREBASE_CONFIG } from '../Environment';
+import { initializeApp } from 'firebase/app';
+import { getDateString } from '../Utils';
+
+// import words from './words';
+import valids from './Valids';
+
+const fbApp = initializeApp(FIREBASE_CONFIG);
 
 /**
- * 사전에 있는 단어라면 true 를 반환한다.
- * @param {string} word
- * @returns {boolean}
+ * 단어의 자음 모을을 문자열 배열로 반환한다.
+ * @returns {string[]}
  */
-export async function searchWord(word) {
+export async function getTodayWord() {
+	const now = new Date();
+	const nowDate = getDateString(now);
+
+	const dbRef = ref(getDatabase(fbApp, 'https://hangle-5db1b-default-rtdb.asia-southeast1.firebasedatabase.app'));
 	try {
-		const url = `https://stdict.korean.go.kr/api/search.do?&key=80E105230FCD3224499425D80C5B6037&req_type=json&type_search=search&q=${word}`;
-
-		// fetch get request
-		const response = await fetch(encodeURI(url), {
-			method: 'GET',
-			// mode: 'no-cors',
-			// headers: {
-			// 	'Access-Control-Allow-Origin': '*',
-			// },
-		});
-		if (response.status === 200) {
-			const json = await response.json();
-			console.log(json);
-
-			return json;
+		const snapshot = await get(child(dbRef, `words/${nowDate}`));
+		if (snapshot.exists()) {
+			return Hangul.d(snapshot.val());
 		} else {
-			throw new Error(response.statusText);
+			console.log('No data available:', nowDate);
 		}
 	} catch (error) {
 		console.error(error);
@@ -32,56 +32,70 @@ export async function searchWord(word) {
 	return null;
 }
 
-/**
- * 문자 배열의 각 문자를 정답과 비교하여 결과 문자열 배열을 반환한다.
- * @param {string[]} letters
- * @returns {string[]}
- */
-export async function validateLetters(letters) {
-	const result = [];
+export function isValidWord(word) {
+	if (valids.indexOf(word) !== -1) {
+		return true;
+	}
 
-	const correctAnswer = '양말';
-	const correctLetters = Hangul.d(correctAnswer);
-	for (let i = 0; i < letters.length; i++) {
-		if (letters[i] === correctLetters[i]) {
-			// correct 검사
-			result[i] = 'correct';
-		} else if (correctLetters.includes(letters[i])) {
-			// contain 검사
-			result[i] = 'contain';
-		} else {
-			// 그 외에는 not-contain
-			result[i] = 'not-contain';
+	return false;
+}
+
+export function parseAndCreateWords() {
+	const now = new Date();
+	let nowDate = getDateString(now);
+
+	const useWordList = [];
+
+	const letterListSet = new Set();
+	const wordSet = new Set();
+	const wordList = words;
+	for (let i = 0, ilen = wordList.length; i < ilen; i++) {
+		const word = wordList[i];
+		if (Hangul.isCompleteAll(word) === false) {
+			continue;
+		}
+
+		const disassembledWord = Hangul.d(word);
+		if (disassembledWord.length !== 6) {
+			continue;
+		}
+
+		if (wordSet.has(word) === false) {
+			wordSet.add(word);
+			letterListSet.add(disassembledWord);
+
+			useWordList[nowDate] = word;
+
+			useWordList.push({
+				nowDate,
+				word,
+			});
+
+			// nowDate 에서 하루 더한 후 yyyy-MM-dd 로 변경
+			const date = new Date(nowDate);
+			date.setDate(date.getDate() + 1);
+			nowDate = date.getFullYear() + '-' + (date.getMonth() + 1 + '').padStart(2, '0') + '-' + (date.getDate() + '').padStart(2, '0');
 		}
 	}
 
-	return result;
-}
+	// 랜덤 숫자 배열 생성
+	const shakeArray = [];
+	for (let i = 0; i < useWordList.length; i++) {
+		shakeArray.push(i);
+	}
+	for (let i = shakeArray.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shakeArray[i], shakeArray[j]] = [shakeArray[j], shakeArray[i]];
+	}
 
-/**
- * 단어의 형태소를 문자열 배열로 반환한다.
- * @returns {string[]}
- */
-export async function getLetters() {
-	return Hangul.d('양말');
-	// try {
-	// 	const url = `https://localhost:1337/api/words/1`;
+	const resultJson = {};
+	for (let i = 0; i < shakeArray.length; i++) {
+		const index = shakeArray[i];
+		const json = useWordList[index];
+		resultJson[json.nowDate] = json.word;
+	}
 
-	// 	// fetch get request
-	// 	const response = await fetch(encodeURI(url), {
-	// 		method: 'GET',
-	// 	});
-	// 	if (response.status === 200) {
-	// 		const json = await response.json();
-	// 		console.log(json);
-
-	// 		return json;
-	// 	} else {
-	// 		throw new Error(response.statusText);
-	// 	}
-	// } catch (error) {
-	// 	console.error(error);
-	// }
-
-	// return null;
+	console.log([...wordSet]);
+	console.log(resultJson);
+	console.log(Object.keys(resultJson).length);
 }

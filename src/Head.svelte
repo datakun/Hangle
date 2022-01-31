@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte/internal';
 	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH, TOTAL_TRY_COUNT } from './Environment';
-	import { animate, showSnackbar } from './Utils';
+	import { animate, getDateString, showSnackbar } from './Utils';
 	import Hangul from 'hangul-js';
 	import Switch from './Switch.svelte';
 
@@ -26,7 +26,7 @@
 	let boxSize = 0;
 
 	const now = new Date();
-	const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
+	const nowDate = getDateString(now);
 
 	let settings = localStorage.getItem('Hangle_settings');
 	let settingsJson = {};

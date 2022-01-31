@@ -1,6 +1,15 @@
 import { snackbarMessage } from './store/GameStore';
 
 /**
+ * 날짜를 문자열로 변환하여 반환한다. yyyy-MM-dd.
+ * @param {Date} date
+ * @returns
+ */
+export function getDateString(date) {
+	return date.getFullYear() + '-' + (date.getMonth() + 1 + '').padStart(2, '0') + '-' + (date.getDate() + '').padStart(2, '0');
+}
+
+/**
  * duration 동안 draw 애니메이션을 timing 규칙에 따라 실행함.
  * @param {Function} timing
  * @param {Function} draw

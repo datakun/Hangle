@@ -5,9 +5,9 @@
 	import { gameState, snackbarMessage } from './store/GameStore';
 	import Hangul from 'hangul-js';
 	import { onDestroy, onMount } from 'svelte/internal';
-	import { getLetters, searchWord } from './api/SearchApi';
+	import { getTodayWord, isValidWord } from './api/SearchApi';
 	import { LETTER_BOX_COUNT, TOTAL_TRY_COUNT } from './Environment';
-	import { showSnackbar } from './Utils';
+	import { getDateString, showSnackbar } from './Utils';
 
 	let answerList = ['', '', '', '', '', ''];
 	let answer;
@@ -17,7 +17,7 @@
 	let totalGameState = {};
 
 	const now = new Date();
-	const nowDate = now.getFullYear() + '' + (now.getMonth() + 1) + '' + now.getDate();
+	const nowDate = getDateString(now);
 	gameState.subscribe(async (value) => {
 		answer = value.answer;
 		tryIndex = value.tryIndex;
@@ -59,7 +59,11 @@
 
 		if (needInitialize === true) {
 			// 새로 생성이 필요하면 answer 초기화
-			const correctAnswer = await getLetters();
+			const correctAnswer = await getTodayWord();
+			if (correctAnswer === null) {
+				return;
+			}
+
 			const answer = Hangul.a(correctAnswer);
 
 			stateJson = {
@@ -147,15 +151,18 @@
 			throw new Error('글자 수가 부족합니다.');
 		}
 
-		// const word = Hangul.a(currentAnswer);
-		// const result = await searchWord(word);
-		// if (result === null) {
-		// 	// TODO: 사전에서 단어 검색. 특정 시간 동안 단어 시도할 수 있는 횟수를 제한한다.
-		// 	runShakeAnimation($gameState.tryIndex);
-		// 	showSnackbar('올바른 단어를 입력하세요.');
+		const word = Hangul.a(currentAnswer);
+		if (word.length != answer.length) {
+			runShakeAnimation(index);
 
-		// 	return;
-		// }
+			throw new Error('정답 단어와 글자수가 다릅니다.');
+		}
+
+		if (isValidWord(word) === false) {
+			runShakeAnimation($gameState.tryIndex);
+
+			throw new Error('올바른 단어를 입력하세요.');
+		}
 
 		const validateResult = new Array(currentAnswer.length);
 		const correctLetters = Hangul.d(answer);
@@ -218,7 +225,7 @@
 				newAnswerList[tryIndex] = currentAnswer;
 				answerList = newAnswerList;
 			}
-		} else if (character === 'enter') {
+		} else if (character === '확인') {
 			let result = false;
 			try {
 				// 정답 검증
