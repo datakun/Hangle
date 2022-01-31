@@ -153,6 +153,7 @@
 					shareText += `${validateResult[j]}`;
 				}
 			}
+			shareText += `\n`;
 		}
 
 		let isStreak = true;
@@ -244,7 +245,7 @@
 			// 모바일 기기는 Web Share API 먼저 사용
 			if (navigator.share) {
 				const shareData = {
-					title: '한:글',
+					// title: '한:글',
 					text: shareText,
 					url: 'https://hangul.vercel.app/',
 				};
