@@ -16,6 +16,8 @@
 
 	let totalGameState = {};
 
+	let validateResultList = [];
+
 	const now = new Date();
 	const nowDate = getDateString(now);
 	gameState.subscribe(async (value) => {
@@ -180,6 +182,8 @@
 			}
 		}
 
+		validateResultList[index] = validateResult;
+
 		const lineIndex = index;
 		let letterIndex = 0;
 		const intervalId = setInterval(() => {
@@ -229,6 +233,30 @@
 		} else if (character === 'enter' || character === '확인') {
 			let result = false;
 			try {
+				// 하드 모드 검증
+				const currentAnswer = answerList[tryIndex];
+				if (currentAnswer.length === LETTER_BOX_COUNT) {
+					let settings = localStorage.getItem('Hangle_settings');
+					if (settings) {
+						const settingsJson = JSON.parse(settings);
+						if (settingsJson.hardMode === true) {
+							for (let i = 0; i < tryIndex; i++) {
+								if (validateResultList[i] !== undefined) {
+									for (let j = 0; j < LETTER_BOX_COUNT; j++) {
+										if (validateResultList[i][j] === 'correct') {
+											if (currentAnswer.substring(j, j + 1) !== answerList[i].substring(j, j + 1)) {
+												runShakeAnimation(tryIndex);
+
+												throw new Error(`${j + 1} 번째 글자는 '${answerList[i].substring(j, j + 1)}'가 되어야 합니다.`);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
 				// 정답 검증
 				result = validateAnswer(tryIndex);
 				if (result === true) {

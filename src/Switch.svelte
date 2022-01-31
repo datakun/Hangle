@@ -1,9 +1,18 @@
 <script>
+	import { createEventDispatcher } from 'svelte';
+
 	export let checked = false;
+	export let disabled = false;
+
+	const dispatch = createEventDispatcher();
+
+	const handleClick = (e) => {
+		dispatch('click', e);
+	};
 </script>
 
-<label class="switch">
-	<input type="checkbox" bind:checked />
+<label class="switch" on:click={handleClick}>
+	<input type="checkbox" bind:checked {disabled} />
 	<span class="slider" />
 </label>
 

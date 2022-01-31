@@ -86,13 +86,6 @@
 		} else {
 			document.body.classList.remove('color-blind-mode');
 		}
-
-		// 하드 모드 설정
-		if (hardMode === true) {
-			document.body.classList.add('hard-mode');
-		} else {
-			document.body.classList.remove('hard-mode');
-		}
 	}
 
 	const calculateRemainTime = () => {
@@ -320,6 +313,12 @@
 
 		animate(timing, draw, 300);
 	};
+
+	const handleHardModeClick = (e) => {
+		if (hardMode === false && todayTryIndex > 0) {
+			showSnackbar('난이도 변경은 첫 시도에만 가능합니다.');
+		}
+	};
 </script>
 
 <div class="head">
@@ -457,9 +456,9 @@
 		<div class="setting-container">
 			<div>
 				<div class="sub-title">난이도 어려움</div>
-				<div class="description">공개된 힌트를 다음 추측 때 사용할 수 없습니다.</div>
+				<div class="description">공개된 힌트를 다음 추측 때 반드시 사용해야 합니다.</div>
 			</div>
-			<Switch bind:checked={hardMode} />
+			<Switch bind:checked={hardMode} disabled={hardMode === false && todayTryIndex > 0} on:click={handleHardModeClick} />
 		</div>
 		<hr style="margin-top: 8px; margin-bottom: 8px;" />
 		<div class="setting-container">
