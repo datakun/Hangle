@@ -276,7 +276,7 @@
 						};
 
 						animate(timing, draw, 300);
-					}, 500);
+					}, 3000);
 				} else {
 					if (tryIndex >= TOTAL_TRY_COUNT - 1) {
 						// 추측 가능 횟수를 모두 사용하면 정답을 알려주고 게임 종료

@@ -40,62 +40,64 @@ export function isValidWord(word) {
 	return false;
 }
 
-export function parseAndCreateWords() {
-	const now = new Date();
-	let nowDate = getDateString(now);
+// export function parseAndCreateWords() {
+// 	const now = new Date();
+// 	let nowDate = getDateString(now);
 
-	const useWordList = [];
+// 	const useWordList = [];
 
-	const letterListSet = new Set();
-	const wordSet = new Set();
-	const wordList = words;
-	for (let i = 0, ilen = wordList.length; i < ilen; i++) {
-		const word = wordList[i];
-		if (Hangul.isCompleteAll(word) === false) {
-			continue;
-		}
+// 	const letterListSet = new Set();
+// 	const wordSet = new Set();
+// 	const wordList = words;
+// 	// wordList 섞기
+// 	wordList.sort(() => Math.random() - 0.5);
+// 	for (let i = 0, ilen = wordList.length; i < ilen; i++) {
+// 		const word = wordList[i];
+// 		if (Hangul.isCompleteAll(word) === false) {
+// 			continue;
+// 		}
 
-		const disassembledWord = Hangul.d(word);
-		if (disassembledWord.length !== 6) {
-			continue;
-		}
+// 		const disassembledWord = Hangul.d(word);
+// 		if (disassembledWord.length !== 6) {
+// 			continue;
+// 		}
 
-		if (wordSet.has(word) === false) {
-			wordSet.add(word);
-			letterListSet.add(disassembledWord);
+// 		if (wordSet.has(word) === false) {
+// 			wordSet.add(word);
+// 			letterListSet.add(disassembledWord);
 
-			useWordList[nowDate] = word;
+// 			useWordList[nowDate] = word;
 
-			useWordList.push({
-				nowDate,
-				word,
-			});
+// 			useWordList.push({
+// 				nowDate,
+// 				word,
+// 			});
 
-			// nowDate 에서 하루 더한 후 yyyy-MM-dd 로 변경
-			const date = new Date(nowDate);
-			date.setDate(date.getDate() + 1);
-			nowDate = date.getFullYear() + '-' + (date.getMonth() + 1 + '').padStart(2, '0') + '-' + (date.getDate() + '').padStart(2, '0');
-		}
-	}
+// 			// nowDate 에서 하루 더한 후 yyyy-MM-dd 로 변경
+// 			const date = new Date(nowDate);
+// 			date.setDate(date.getDate() + 1);
+// 			nowDate = date.getFullYear() + '-' + (date.getMonth() + 1 + '').padStart(2, '0') + '-' + (date.getDate() + '').padStart(2, '0');
+// 		}
+// 	}
 
-	// 랜덤 숫자 배열 생성
-	const shakeArray = [];
-	for (let i = 0; i < useWordList.length; i++) {
-		shakeArray.push(i);
-	}
-	for (let i = shakeArray.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[shakeArray[i], shakeArray[j]] = [shakeArray[j], shakeArray[i]];
-	}
+// 	// 랜덤 숫자 배열 생성
+// 	const shakeArray = [];
+// 	for (let i = 0; i < useWordList.length; i++) {
+// 		shakeArray.push(i);
+// 	}
+// 	for (let i = shakeArray.length - 1; i > 0; i--) {
+// 		const j = Math.floor(Math.random() * (i + 1));
+// 		[shakeArray[i], shakeArray[j]] = [shakeArray[j], shakeArray[i]];
+// 	}
 
-	const resultJson = {};
-	for (let i = 0; i < shakeArray.length; i++) {
-		const index = shakeArray[i];
-		const json = useWordList[index];
-		resultJson[json.nowDate] = json.word;
-	}
+// 	const resultJson = {};
+// 	for (let i = 0; i < shakeArray.length; i++) {
+// 		const index = shakeArray[i];
+// 		const json = useWordList[index];
+// 		resultJson[json.nowDate] = json.word;
+// 	}
 
-	console.log([...wordSet]);
-	console.log(resultJson);
-	console.log(Object.keys(resultJson).length);
-}
+// 	console.log([...wordSet]);
+// 	console.log(resultJson);
+// 	console.log(Object.keys(resultJson).length);
+// }

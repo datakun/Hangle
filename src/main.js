@@ -1,4 +1,4 @@
-import { parseAndCreateWords } from './api/SearchApi';
+// import { parseAndCreateWords } from './api/SearchApi';
 import App from './App.svelte';
 
 // parseAndCreateWords();

@@ -344,7 +344,7 @@ body.color-blind-mode .share-button {
 	position: absolute;
 	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
-	transition: 0.75s;
+	transition: 0.5s;
 	perspective: 300px;
 }
 
