@@ -240,20 +240,49 @@
 	};
 
 	const handleShareClick = () => {
-		if (navigator.clipboard) {
-			navigator.clipboard.writeText(shareText).then(() => {
+		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+			// 모바일 기기는 Web Share API 먼저 사용
+			if (navigator.share) {
+				const shareData = {
+					title: '한:글',
+					text: shareText,
+					url: 'https://hangul.vercel.app/',
+				};
+				navigator.share(shareData).then(() => {
+					showSnackbar('문제 풀이 결과를 공유합니다.');
+				});
+			} else if (navigator.clipboard) {
+				navigator.clipboard.writeText(shareText).then(() => {
+					showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+				});
+			} else {
+				const tempElem = document.createElement('textarea');
+				tempElem.value = shareText;
+				document.body.appendChild(tempElem);
+
+				tempElem.select();
+				document.execCommand('copy');
+				document.body.removeChild(tempElem);
+
 				showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
-			});
+			}
 		} else {
-			const tempElem = document.createElement('textarea');
-			tempElem.value = shareText;
-			document.body.appendChild(tempElem);
+			// 그 외에는 Clipboard 사용
+			if (navigator.clipboard) {
+				navigator.clipboard.writeText(shareText).then(() => {
+					showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+				});
+			} else {
+				const tempElem = document.createElement('textarea');
+				tempElem.value = shareText;
+				document.body.appendChild(tempElem);
 
-			tempElem.select();
-			document.execCommand('copy');
-			document.body.removeChild(tempElem);
+				tempElem.select();
+				document.execCommand('copy');
+				document.body.removeChild(tempElem);
 
-			showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+				showSnackbar('문제 풀이 결과가 클립보드에 복사되었습니다.');
+			}
 		}
 	};
 

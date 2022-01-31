@@ -7,7 +7,7 @@
 	import { onDestroy, onMount } from 'svelte/internal';
 	import { getTodayWord, isValidWord } from './api/SearchApi';
 	import { LETTER_BOX_COUNT, TOTAL_TRY_COUNT } from './Environment';
-	import { getDateString, showSnackbar } from './Utils';
+	import { animate, getDateString, showSnackbar } from './Utils';
 
 	let answerList = ['', '', '', '', '', ''];
 	let answer;
@@ -261,6 +261,22 @@
 				result = validateAnswer(tryIndex);
 				if (result === true) {
 					showSnackbar('정답입니다.');
+
+					// 통계 표시
+					setTimeout(() => {
+						const container = document.querySelector('.leaderboard');
+						container.classList.add('open');
+
+						const timing = (timeFraction) => {
+							return timeFraction;
+						};
+
+						const draw = (progress) => {
+							container.style.opacity = progress;
+						};
+
+						animate(timing, draw, 300);
+					}, 500);
 				} else {
 					if (tryIndex >= TOTAL_TRY_COUNT - 1) {
 						// 추측 가능 횟수를 모두 사용하면 정답을 알려주고 게임 종료
