@@ -359,27 +359,28 @@
 				</div>
 			{/each}
 		</div>
-		<p>자음 'ㅌ'은 단어에 포함되어있고 위치까지 맞습니다.</p>
+		<p>단어 <b>'퇴근'</b>에는 자음 'ㅌ'은 단어에 포함되어있고 위치까지 맞습니다.</p>
 		<div class="flip-container">
 			{#each new Array(LETTER_BOX_COUNT) as _, j}
 				<div class="flipper" style="width: {boxSize}px; height: {boxSize}px; line-height: {boxSize}px;">
-					<div class="box letter-{j} border front {j === 2 ? 'contain' : ''}">{'ㅌㅗㅣㄱㅡㄴ'.substring(j, j + 1)}</div>
-					<div class="box letter-{j} border back {j === 2 ? 'contain' : ''}">{'ㅌㅗㅣㄱㅡㄴ'.substring(j, j + 1)}</div>
+					<div class="box letter-{j} border front {j === 1 ? 'contain' : ''}">{'ㅎㅣㅁㄲㅓㅅ'.substring(j, j + 1)}</div>
+					<div class="box letter-{j} border back {j === 1 ? 'contain' : ''}">{'ㅎㅣㅁㄲㅓㅅ'.substring(j, j + 1)}</div>
 				</div>
 			{/each}
 		</div>
-		<p>모음 'ㅣ'는 단어에 포함되어있지만 위치는 틀렸습니다.</p>
+		<p>단어 <b>'힘껏'</b>에는 모음 'ㅣ'는 단어에 포함되어있지만 위치는 틀렸습니다.</p>
 		<div class="flip-container">
 			{#each new Array(LETTER_BOX_COUNT) as _, j}
 				<div class="flipper" style="width: {boxSize}px; height: {boxSize}px; line-height: {boxSize}px;">
-					<div class="box letter-{j} border front {j === 3 ? 'not-contain' : ''}">{'ㅌㅗㅣㄱㅡㄴ'.substring(j, j + 1)}</div>
-					<div class="box letter-{j} border back {j === 3 ? 'not-contain' : ''}">{'ㅌㅗㅣㄱㅡㄴ'.substring(j, j + 1)}</div>
+					<div class="box letter-{j} border front {j === 3 ? 'not-contain' : ''}">{'ㅇㅓㅂㅅㄷㅏ'.substring(j, j + 1)}</div>
+					<div class="box letter-{j} border back {j === 3 ? 'not-contain' : ''}">{'ㅇㅓㅂㅅㄷㅏ'.substring(j, j + 1)}</div>
 				</div>
 			{/each}
 		</div>
-		<p>자음 'ㄱ'은 단어에 포함되지 않습니다.</p>
+		<p>단어 <b>'없다'</b>에는 자음 'ㅅ'은 단어에 포함되지 않습니다.</p>
 		<hr />
 		<p><b>한:글</b>은 매일 새로운 문제를 제출합니다.</p>
+		<p><b>한국어기초사전</b>에 등록된 단어를 문제로 제출합니다.</p>
 	</div>
 </div>
 <div class="leaderboard head-container">
