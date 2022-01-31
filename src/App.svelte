@@ -152,11 +152,12 @@
 		}
 
 		const word = Hangul.a(currentAnswer);
-		if (word.length != answer.length) {
-			runShakeAnimation(index);
+		// NOTE: 추측을 위해서 이 조건은 주석처리하는게 나을까?
+		// if (word.length != answer.length) {
+		// 	runShakeAnimation(index);
 
-			throw new Error('정답 단어와 글자수가 다릅니다.');
-		}
+		// 	throw new Error('정답 단어와 글자수가 다릅니다.');
+		// }
 
 		if (isValidWord(word) === false) {
 			runShakeAnimation($gameState.tryIndex);
