@@ -42,7 +42,7 @@
 			let result = ValidateResult.Incorrect;
 			if (value.validateType === ValidateType.All) {
 				// 모든 시도 검증
-				for (let i = 0; i < tryIndex; i++) {
+				for (let i = 0; i <= tryIndex; i++) {
 					if (value.answerList[i] !== '' && value.answerList[i].length === LETTER_BOX_COUNT) {
 						result = validateAnswer(i, value.answerList, value.answer);
 					}
