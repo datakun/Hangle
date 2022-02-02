@@ -228,41 +228,48 @@
 		});
 	};
 
+	/**
+	 * 입력된 answerList 에 따라 키보드의 색상을 변경한다.
+	 * @param {string[]} answerList 추측 목록
+	 * @param {string} answer 정답
+	 */
 	const updateKeyButtons = (answerList, answer) => {
 		const keyboard = document.querySelector('.keyboard');
 		if (!keyboard) {
 			return;
 		}
 
-		const disassembledAnswer = Hangul.d(answer);
+		const correctAnswerLetters = Hangul.d(answer);
 		for (const button of keyboard.querySelectorAll('.button.key')) {
 			if (button.innerText.length > 1) {
 				continue;
 			}
 
-			for (const _answer of answerList) {
-				const index = _answer.lastIndexOf(button.innerText);
-				if (index === -1) {
-					continue;
-				}
-
-				if (disassembledAnswer[index] === button.innerText) {
-					if (button.classList.contains('contain') === true) {
-						button.classList.remove('contain');
-					}
-					button.classList.add('correct');
-
-					break;
-				} else if (disassembledAnswer.includes(button.innerText)) {
-					if (button.classList.contains('correct') === false) {
-						button.classList.add('contain');
+			for (const userAnswer of answerList) {
+				const userAnswerLetters = Hangul.d(userAnswer);
+				for (let i = 0; i < userAnswerLetters.length; i++) {
+					if (userAnswerLetters[i] !== button.innerText) {
+						continue;
 					}
 
-					break;
-				} else {
-					button.classList.add('not-contain');
-
-					break;
+					// 추측한 단어 목록에서 현재 키가 포함되어있으면 색상이 바뀔 자격이 됨.
+					if (correctAnswerLetters[i] === button.innerText) {
+						// 정답 단어의 글자 위치와 같은 경우
+						if (button.classList.contains('contain') === true) {
+							// contain 상태일 경우, 기존 상태를 제거하고 correct 상태를 추가한다.
+							button.classList.remove('contain');
+						}
+						button.classList.add('correct');
+					} else if (correctAnswerLetters.includes(button.innerText)) {
+						// 정답 단어에 글자가 포함된 경우
+						if (button.classList.contains('correct') === false) {
+							// correct 상태가 아닐 경우에만 contain 상태를 추가한다.
+							button.classList.add('contain');
+						}
+					} else {
+						// 정답 단어에 글자가 포함되지 않은 경우
+						button.classList.add('not-contain');
+					}
 				}
 			}
 		}
