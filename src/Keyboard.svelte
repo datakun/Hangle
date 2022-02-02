@@ -8,52 +8,10 @@
 	let answerList = ['', '', '', '', '', ''];
 	let answer = '';
 
-	const updateKeyButtons = () => {
-		const keyboard = document.querySelector('.keyboard');
-		if (!keyboard) {
-			return;
-		}
-
-		const disassembledAnswer = Hangul.d(answer);
-		for (const button of keyboard.querySelectorAll('.button.key')) {
-			if (button.innerText.length > 1) {
-				continue;
-			}
-
-			for (const _answer of answerList) {
-				const index = _answer.lastIndexOf(button.innerText);
-				if (index === -1) {
-					continue;
-				}
-
-				if (disassembledAnswer[index] === button.innerText) {
-					if (button.classList.contains('contain') === true) {
-						button.classList.remove('contain');
-					}
-					button.classList.add('correct');
-
-					break;
-				} else if (disassembledAnswer.includes(button.innerText)) {
-					if (button.classList.contains('correct') === false) {
-						button.classList.add('contain');
-					}
-
-					break;
-				} else {
-					button.classList.add('not-contain');
-
-					break;
-				}
-			}
-		}
-	};
-
 	onMount(() => {
 		gameState.subscribe((value) => {
 			answerList = value.answerList;
 			answer = value.answer;
-
-			updateKeyButtons();
 		});
 
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
@@ -72,8 +30,6 @@
 		}
 
 		document.addEventListener('keydown', handleKeyInput);
-
-		updateKeyButtons();
 	});
 
 	onDestroy(() => {

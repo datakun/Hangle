@@ -57,18 +57,26 @@
 				runShakeAnimation(tryIndex);
 
 				showSnackbar('글자 수가 부족합니다.');
+
+				return;
 			} else if (result === ValidateResult.DifferentWordLength) {
 				runShakeAnimation(tryIndex);
 
 				showSnackbar('정답 단어와 글자 수가 다릅니다.');
+
+				return;
 			} else if (result === ValidateResult.NotExistWord) {
 				runShakeAnimation(tryIndex);
 
 				showSnackbar('사전에 없는 단어입니다.');
+
+				return;
 			} else if (result >= 0 && result <= 5) {
 				runShakeAnimation(tryIndex);
 
 				showSnackbar(`${result + 1} 번째 글자는 '${Hangul.d(answer).substring(result, result + 1)}'가 되어야 합니다.`);
+
+				return;
 			} else if (result === ValidateResult.Correct) {
 				showSnackbar('정답입니다.');
 
@@ -94,11 +102,9 @@
 				}
 			}
 
-			// 정답이거나 오답일 때만 게임 데이터 업데이트
-			if (result !== ValidateResult.Correct && result !== ValidateResult.Incorrect) {
-				return;
-			}
+			updateKeyButtons(value.answerList, value.answer);
 
+			// 정답이거나 오답일 때만 게임 데이터 업데이트
 			let newTryIndex = tryIndex;
 			let newIsFinished = isFinished;
 			if (value.validateType === ValidateType.Current) {
@@ -222,11 +228,53 @@
 		});
 	};
 
+	const updateKeyButtons = (answerList, answer) => {
+		const keyboard = document.querySelector('.keyboard');
+		if (!keyboard) {
+			return;
+		}
+
+		const disassembledAnswer = Hangul.d(answer);
+		for (const button of keyboard.querySelectorAll('.button.key')) {
+			if (button.innerText.length > 1) {
+				continue;
+			}
+
+			for (const _answer of answerList) {
+				const index = _answer.lastIndexOf(button.innerText);
+				if (index === -1) {
+					continue;
+				}
+
+				if (disassembledAnswer[index] === button.innerText) {
+					if (button.classList.contains('contain') === true) {
+						button.classList.remove('contain');
+					}
+					button.classList.add('correct');
+
+					break;
+				} else if (disassembledAnswer.includes(button.innerText)) {
+					if (button.classList.contains('correct') === false) {
+						button.classList.add('contain');
+					}
+
+					break;
+				} else {
+					button.classList.add('not-contain');
+
+					break;
+				}
+			}
+		}
+	};
+
 	/**
 	 * index 째의 추측 결과를 숫자로 반환한다.
 	 * -1: 정답. -2: 정답이 아님. -3: 글자 수 부족. -4: 정답 단어와 글자수가 다름. -5: 사전에 없는 단어.
 	 * 0 ~ 5: 하드 모드 일때 몇 번째 글자가 제 자리가 아닌지 반환한다.
 	 * @param {number} index
+	 * @param {string[]} answerList
+	 * @param {string} correctAnswer
 	 * @returns {ValidateResult}
 	 */
 	const validateAnswer = (index, answerList, correctAnswer) => {
