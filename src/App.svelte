@@ -95,13 +95,18 @@
 				}
 			}
 
-			const newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
+			let newTryIndex = tryIndex;
+			let newIsFinished = isFinished;
+			if (value.validateType === ValidateType.Current) {
+				newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
+				newIsFinished = isLastTry;
+			}
 
 			const newState = {
 				answerList: answerList, // [ㅈㅓㅇㄷㅏㅂ, ...]
 				answer: answer, // 정답
-				tryIndex: value.validateType === ValidateType.All ? tryIndex : newTryIndex, // 현재 시도만 검증할 경우 새로운 시도 횟수를 설정
-				isFinished: isLastTry, // 시도가 마지막일 경우
+				tryIndex: newTryIndex, // 현재 시도만 검증할 경우 새로운 시도 횟수를 설정
+				isFinished: newIsFinished, // 현재 시도만 검증할 경우에 마지막 시도 여부에 따라 finished 결정
 			};
 
 			// 검증 작업 끝나고 나면 게임 데이터 저장
@@ -300,19 +305,19 @@
 			return;
 		}
 
-		const character = e.detail;
-		if (character.length === 1) {
+		const input = e.detail;
+		if (input.length === 1) {
 			// 한글 자음 모음 삽입
-			if (character.match(/[ㄱ-ㅎㅏ-ㅣ]/)) {
+			if (input.match(/[ㄱ-ㅎㅏ-ㅣ]/)) {
 				let currentAnswer = answerList[tryIndex];
 				if (currentAnswer.length < LETTER_BOX_COUNT) {
-					currentAnswer += character;
+					currentAnswer += input;
 					const newAnswerList = [...answerList];
 					newAnswerList[tryIndex] = currentAnswer;
 					answerList = newAnswerList;
 				}
 			}
-		} else if (character === 'backspace' || character === 'delete') {
+		} else if (input === 'backspace' || input === 'delete') {
 			// 문자 삭제
 			let currentAnswer = answerList[tryIndex];
 			if (currentAnswer.length > 0) {
@@ -321,7 +326,7 @@
 				newAnswerList[tryIndex] = currentAnswer;
 				answerList = newAnswerList;
 			}
-		} else if (character === 'enter' || character === '확인') {
+		} else if (input === 'enter' || input === '확인') {
 			// game state 를 업데이트하면 정답을 검증 함.
 			// 페이지를 다시 로드 했을때 같은 로직을 수행할 수 있도록 하기 위해 이렇게 설정
 			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
