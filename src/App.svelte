@@ -72,6 +72,11 @@
 
 					animate(timing, draw, 300);
 				}, 3000);
+			} else if (result === ValidateResult.Incorrect) {
+				if (isFinished === true && isLastTry === true) {
+					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
+					showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+				}
 			} else if (result === ValidateResult.NotEnoughLetters) {
 				runShakeAnimation(tryIndex);
 
@@ -88,11 +93,11 @@
 				runShakeAnimation(tryIndex);
 
 				showSnackbar(`${result + 1} 번째 글자는 '${Hangul.d(answer).substring(result, result + 1)}'가 되어야 합니다.`);
-			} else if (result === ValidateResult.Incorrect) {
-				if (isFinished === true && isLastTry === true) {
-					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
-					showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
-				}
+			}
+
+			// 정답이거나 오답일 때만 게임 데이터 업데이트
+			if (result !== ValidateResult.Correct && result !== ValidateResult.Incorrect) {
+				return;
 			}
 
 			let newTryIndex = tryIndex;
