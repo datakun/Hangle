@@ -107,9 +107,17 @@
 			// 정답이거나 오답일 때만 게임 데이터 업데이트
 			let newTryIndex = tryIndex;
 			let newIsFinished = isFinished;
+			// 현재 시도만 검증하는 경우
 			if (value.validateType === ValidateType.Current) {
-				newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
-				newIsFinished = isLastTry;
+				// 오답일 경우 새로운 시도 횟수를 설정함.
+				if (result === ValidateResult.Incorrect) {
+					newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
+				}
+
+				// 정답이거나, 오답인데 마지막 시도인 경우 종료 여부를 설정함.
+				if (result === ValidateResult.Correct || (result === ValidateResult.Incorrect && isLastTry === true)) {
+					newIsFinished = true;
+				}
 			}
 
 			answerList = value.answerList;
@@ -117,8 +125,8 @@
 			const newState = {
 				answerList: answerList, // [ㅈㅓㅇㄷㅏㅂ, ...]
 				answer: answer, // 정답
-				tryIndex: newTryIndex, // 현재 시도만 검증할 경우 새로운 시도 횟수를 설정
-				isFinished: newIsFinished, // 현재 시도만 검증할 경우에 마지막 시도 여부에 따라 finished 결정
+				tryIndex: newTryIndex,
+				isFinished: newIsFinished,
 			};
 
 			// 검증 작업 끝나고 나면 게임 데이터 저장

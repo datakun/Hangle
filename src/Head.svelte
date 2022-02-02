@@ -110,6 +110,8 @@
 	// 통계 계산. totalGameState 가 변경되면 실행 됨.
 	$: {
 		const updateDateList = Object.keys(totalGameState);
+
+		// 초기화
 		// 게임 횟수
 		played = updateDateList.filter((date) => totalGameState[date].isFinished === true).length;
 		// 승리 횟수
@@ -118,6 +120,11 @@
 		currentStreak = -1;
 		// 최대 연승 횟수
 		maxStreak = 0;
+
+		distribution = [0, 0, 0, 0, 0, 0];
+		distributionMode = 0;
+		todayTryIndex = -1;
+		isCorrect = false;
 
 		// 오늘 시도한 횟수 계산
 		const todayGameState = totalGameState[nowDate];
@@ -162,16 +169,17 @@
 		for (let i = updateDateList.length - 1; i >= 0; i--) {
 			const updateDate = updateDateList[i];
 			const gameState = totalGameState[updateDate];
-			if (gameState.isFinished === true && Hangul.a(gameState.answerList[gameState.tryIndex]) === gameState.answer) {
+			const { isFinished, answerList, answer, tryIndex } = gameState;
+			if (isFinished === true && Hangul.a(answerList[tryIndex]) === answer) {
 				// 게임이 끝났고, 마지막으로 시도한 단어가 정답이면 승리 횟수 증가
 				winCount++;
 
 				// 분포 계산
-				distribution[gameState.tryIndex] = distribution[gameState.tryIndex] + 1;
+				distribution[tryIndex] = distribution[tryIndex] + 1;
 
 				// 최빈값 계산
-				if (distributionMode < distribution[gameState.tryIndex]) {
-					distributionMode = distribution[gameState.tryIndex];
+				if (distributionMode < distribution[tryIndex]) {
+					distributionMode = distribution[tryIndex];
 				}
 
 				// 연승 계산
@@ -448,9 +456,9 @@
 						{i}
 						<div
 							class="bar"
-							style="background-color: {isCorrect === true && todayTryIndex === i ? 'rgb(97, 140, 85)' : 'rgb(58, 58, 58)'}; width: {item === 0
-								? '4'
-								: (item / distributionMode) * 100}%; "
+							style="background-color: {isCorrect === true && todayTryIndex === i ? 'rgb(97, 140, 85)' : 'rgb(58, 58, 58)'};{item === 0
+								? ''
+								: ` width: ${(item / distributionMode) * 100}%`};"
 						>
 							{item}
 						</div>
@@ -649,7 +657,8 @@
 
 	.leaderboard .bar {
 		margin-left: 4px;
-		padding-right: 8px;
+		padding-left: 6px;
+		padding-right: 6px;
 		height: 22px;
 		line-height: 20px;
 		text-align: end;
