@@ -27,11 +27,16 @@
 				}
 
 				if (disassembledAnswer[index] === button.innerText) {
+					if (button.classList.contains('contain') === true) {
+						button.classList.remove('contain');
+					}
 					button.classList.add('correct');
 
 					break;
 				} else if (disassembledAnswer.includes(button.innerText)) {
-					button.classList.add('contain');
+					if (button.classList.contains('correct') === false) {
+						button.classList.add('contain');
+					}
 
 					break;
 				} else {
