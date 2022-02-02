@@ -24,7 +24,6 @@
 	onMount(async () => {
 		gameState.subscribe(async (value) => {
 			answer = value.answer;
-			answerList = value.answerList;
 			tryIndex = value.tryIndex;
 			isFinished = value.isFinished;
 
@@ -43,18 +42,34 @@
 			let result = ValidateResult.Incorrect;
 			if (value.validateType === ValidateType.All) {
 				// 모든 시도 검증
-				for (let i = 0; i <= tryIndex; i++) {
-					if (answerList[i] !== '' && answerList[i].length === LETTER_BOX_COUNT) {
-						result = validateAnswer(i);
+				for (let i = 0; i < tryIndex; i++) {
+					if (value.answerList[i] !== '' && value.answerList[i].length === LETTER_BOX_COUNT) {
+						result = validateAnswer(i, value.answerList, value.answer);
 					}
 				}
 			} else if (value.validateType === ValidateType.Current) {
 				// 현재 시도만 검증
-				result = validateAnswer(tryIndex);
+				result = validateAnswer(tryIndex, value.answerList, value.answer);
 			}
 
 			// 마지막 검증 결과를 토대로 작업 수행.
-			if (result === ValidateResult.Correct) {
+			if (result === ValidateResult.NotEnoughLetters) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('글자 수가 부족합니다.');
+			} else if (result === ValidateResult.DifferentWordLength) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('정답 단어와 글자 수가 다릅니다.');
+			} else if (result === ValidateResult.NotExistWord) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('사전에 없는 단어입니다.');
+			} else if (result >= 0 && result <= 5) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar(`${result + 1} 번째 글자는 '${Hangul.d(answer).substring(result, result + 1)}'가 되어야 합니다.`);
+			} else if (result === ValidateResult.Correct) {
 				showSnackbar('정답입니다.');
 
 				// 통계 표시
@@ -77,22 +92,6 @@
 					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
 					showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
 				}
-			} else if (result === ValidateResult.NotEnoughLetters) {
-				runShakeAnimation(tryIndex);
-
-				showSnackbar('글자 수가 부족합니다.');
-			} else if (result === ValidateResult.DifferentWordLength) {
-				runShakeAnimation(tryIndex);
-
-				showSnackbar('정답 단어와 글자 수가 다릅니다.');
-			} else if (result === ValidateResult.NotExistWord) {
-				runShakeAnimation(tryIndex);
-
-				showSnackbar('사전에 없는 단어입니다.');
-			} else if (result >= 0 && result <= 5) {
-				runShakeAnimation(tryIndex);
-
-				showSnackbar(`${result + 1} 번째 글자는 '${Hangul.d(answer).substring(result, result + 1)}'가 되어야 합니다.`);
 			}
 
 			// 정답이거나 오답일 때만 게임 데이터 업데이트
@@ -106,6 +105,8 @@
 				newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
 				newIsFinished = isLastTry;
 			}
+
+			answerList = value.answerList;
 
 			const newState = {
 				answerList: answerList, // [ㅈㅓㅇㄷㅏㅂ, ...]
@@ -228,7 +229,7 @@
 	 * @param {number} index
 	 * @returns {ValidateResult}
 	 */
-	const validateAnswer = (index) => {
+	const validateAnswer = (index, answerList, correctAnswer) => {
 		const currentAnswer = answerList[index];
 		const word = Hangul.a(currentAnswer);
 
@@ -267,7 +268,7 @@
 		}
 
 		const validateResult = new Array(currentAnswer.length);
-		const correctLetters = Hangul.d(answer);
+		const correctLetters = Hangul.d(correctAnswer);
 		for (let i = 0; i < currentAnswer.length; i++) {
 			if (currentAnswer[i] === correctLetters[i]) {
 				// correct
@@ -337,6 +338,7 @@
 			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
 			const newState = {
 				...$gameState,
+				answerList: answerList,
 				validateType: ValidateType.Current,
 			};
 			gameState.set(newState);
