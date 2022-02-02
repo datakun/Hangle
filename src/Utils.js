@@ -5,8 +5,8 @@ import { snackbarMessage } from './store/GameStore';
  * @param {Date} date
  * @returns
  */
-export function getDateString(date) {
-	return date.getFullYear() + '-' + (date.getMonth() + 1 + '').padStart(2, '0') + '-' + (date.getDate() + '').padStart(2, '0');
+export function getDateString(date, seperator = '-') {
+	return date.getFullYear() + seperator + (date.getMonth() + 1 + '').padStart(2, '0') + seperator + (date.getDate() + '').padStart(2, '0');
 }
 
 /**

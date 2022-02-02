@@ -5,17 +5,17 @@
 	import Hangul from 'hangul-js';
 
 	export let answerList = ['', '', '', '', '', ''];
-	let answer;
-	let tryIndex;
+	let answer = '';
+	let tryIndex = 0;
 
 	let boxSize = 0;
 
-	gameState.subscribe((value) => {
-		answer = value.answer;
-		tryIndex = value.tryIndex;
-	});
-
 	onMount(() => {
+		gameState.subscribe((value) => {
+			answer = value.answer;
+			tryIndex = value.tryIndex;
+		});
+
 		const screenWidth = window.innerWidth;
 		const containerWidth = screenWidth > MIN_SCREEN_WIDTH ? MIN_SCREEN_WIDTH - 60 : screenWidth - 60;
 		boxSize = containerWidth / 7;

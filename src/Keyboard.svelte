@@ -6,7 +6,7 @@
 	import Hangul from 'hangul-js';
 
 	let answerList = ['', '', '', '', '', ''];
-	let answer;
+	let answer = '';
 
 	const updateKeyButtons = () => {
 		const keyboard = document.querySelector('.keyboard');
@@ -21,7 +21,7 @@
 			}
 
 			for (const _answer of answerList) {
-				const index = _answer.indexOf(button.innerText);
+				const index = _answer.lastIndexOf(button.innerText);
 				if (index === -1) {
 					continue;
 				}
@@ -48,14 +48,14 @@
 		}
 	};
 
-	gameState.subscribe((value) => {
-		answerList = value.answerList;
-		answer = value.answer;
-
-		updateKeyButtons();
-	});
-
 	onMount(() => {
+		gameState.subscribe((value) => {
+			answerList = value.answerList;
+			answer = value.answer;
+
+			updateKeyButtons();
+		});
+
 		// 컴포넌트가 마운트되면 버튼 이벤트 연결 및 사이즈 설정
 		const screenWidth = window.innerWidth;
 		const width = screenWidth > MIN_SCREEN_WIDTH ? MIN_SCREEN_WIDTH - 60 - 16 : screenWidth - 60 - 16; // min-width - button-margin * 20 - component-padding * 2

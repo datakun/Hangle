@@ -6,13 +6,13 @@
 	import Hangul from 'hangul-js';
 	import { onDestroy, onMount } from 'svelte/internal';
 	import { getTodayWord, isValidWord } from './api/SearchApi';
-	import { LETTER_BOX_COUNT, TOTAL_TRY_COUNT } from './Environment';
+	import { ValidateResult, ValidateType, LETTER_BOX_COUNT, TOTAL_TRY_COUNT } from './Environment';
 	import { animate, getDateString, showSnackbar } from './Utils';
 
 	let answerList = ['', '', '', '', '', ''];
-	let answer;
-	let tryIndex;
-	let isFinished;
+	let answer = '';
+	let tryIndex = 0;
+	let isFinished = false;
 
 	let totalGameState = {};
 
@@ -20,20 +20,106 @@
 
 	const now = new Date();
 	const nowDate = getDateString(now);
-	gameState.subscribe(async (value) => {
-		answer = value.answer;
-		tryIndex = value.tryIndex;
-		isFinished = value.isFinished;
-
-		totalGameState = {
-			...totalGameState,
-			[nowDate]: value,
-		};
-	});
 
 	onMount(async () => {
+		gameState.subscribe(async (value) => {
+			answer = value.answer;
+			answerList = value.answerList;
+			tryIndex = value.tryIndex;
+			isFinished = value.isFinished;
+
+			totalGameState = {
+				...totalGameState,
+				[nowDate]: value,
+			};
+
+			if (value.validateType === ValidateType.None) {
+				return;
+			}
+
+			const isLastTry = tryIndex === TOTAL_TRY_COUNT - 1;
+
+			// game state 가 변경되면 validate 수행 후 정답 알려줌.
+			let result = ValidateResult.Incorrect;
+			if (value.validateType === ValidateType.All) {
+				// 모든 시도 검증
+				for (let i = 0; i <= tryIndex; i++) {
+					if (answerList[i] !== '' && answerList[i].length === LETTER_BOX_COUNT) {
+						result = validateAnswer(i);
+					}
+				}
+			} else if (value.validateType === ValidateType.Current) {
+				// 현재 시도만 검증
+				result = validateAnswer(tryIndex);
+			}
+
+			// 마지막 검증 결과를 토대로 작업 수행.
+			if (result === ValidateResult.Correct) {
+				showSnackbar('정답입니다.');
+
+				// 통계 표시
+				setTimeout(() => {
+					const container = document.querySelector('.leaderboard');
+					container.classList.add('open');
+
+					const timing = (timeFraction) => {
+						return timeFraction;
+					};
+
+					const draw = (progress) => {
+						container.style.opacity = progress;
+					};
+
+					animate(timing, draw, 300);
+				}, 3000);
+			} else if (result === ValidateResult.NotEnoughLetters) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('글자 수가 부족합니다.');
+			} else if (result === ValidateResult.DifferentWordLength) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('정답 단어와 글자 수가 다릅니다.');
+			} else if (result === ValidateResult.NotExistWord) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar('사전에 없는 단어입니다.');
+			} else if (result >= 0 && result <= 5) {
+				runShakeAnimation(tryIndex);
+
+				showSnackbar(`${result + 1} 번째 글자는 '${Hangul.d(answer).substring(result, result + 1)}'가 되어야 합니다.`);
+			} else if (result === ValidateResult.Incorrect) {
+				if (isFinished === true && isLastTry === true) {
+					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
+					showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
+				}
+			}
+
+			const newTryIndex = tryIndex + 1 > TOTAL_TRY_COUNT - 1 ? TOTAL_TRY_COUNT - 1 : tryIndex + 1;
+
+			const newState = {
+				answerList: answerList, // [ㅈㅓㅇㄷㅏㅂ, ...]
+				answer: answer, // 정답
+				tryIndex: value.validateType === ValidateType.All ? tryIndex : newTryIndex, // 현재 시도만 검증할 경우 새로운 시도 횟수를 설정
+				isFinished: isLastTry, // 시도가 마지막일 경우
+			};
+
+			// 검증 작업 끝나고 나면 게임 데이터 저장
+			let state = localStorage.getItem('Hangle_gameState');
+			let stateJson = JSON.parse(state);
+			stateJson = {
+				...stateJson,
+				[nowDate]: newState,
+			};
+
+			// local storage 에 gameState 저장
+			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
+
+			newState.validateType = ValidateType.None;
+			gameState.set(newState);
+		});
+
 		// local storage 에서 게임 상태 가져오기
-		// answerList, answer, tryIndex, isFinished;
 		let needInitialize = false;
 		let state = localStorage.getItem('Hangle_gameState');
 		let stateJson = {};
@@ -71,9 +157,9 @@
 			stateJson = {
 				...stateJson,
 				[nowDate]: {
-					tryIndex: 0, // 0 ~ 6. 6 은 실패를 의미한다.
 					answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
 					answer: answer, // 정답
+					tryIndex: 0, // 0 ~ 5.
 					isFinished: false,
 				},
 			};
@@ -82,33 +168,19 @@
 			localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
 		}
 
-		answerList = stateJson[nowDate].answerList;
-
 		totalGameState = stateJson;
 
 		// store 저장
-		gameState.set(stateJson[nowDate]);
+		const currentGameState = {
+			...stateJson[nowDate],
+			validateType: needInitialize === false && stateJson[nowDate].tryIndex > 0 ? ValidateType.All : ValidateType.None, // 처음 마운트 됐을때는 초기화 하지 않았다면 모든 시도 검증, 초기화 했다면 검증 안 함
+		};
+		gameState.set(currentGameState);
 
 		// 애니메이션 종료 후 클래스를 제거하기 위해 이벤트 등록
 		for (let i = 0; i < TOTAL_TRY_COUNT; i++) {
 			const rowContainer = document.getElementById(`line-${i}`);
 			rowContainer?.addEventListener('animationend', handleShakeAnimationEnd, false);
-		}
-
-		// 이전에 입력한 답의 애니메이션 수행
-		try {
-			let result = false;
-			for (let i = 0; i <= tryIndex; i++) {
-				if (answerList[i] !== '' && answerList[i].length === LETTER_BOX_COUNT) {
-					result = validateAnswer(i);
-				}
-			}
-
-			if (tryIndex >= TOTAL_TRY_COUNT - 1 && result === false) {
-				showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
-			}
-		} catch (error) {
-			showSnackbar(error.message);
 		}
 	});
 
@@ -140,31 +212,48 @@
 	};
 
 	/**
-	 * 추측 가능 횟수 내에 정답을 맞추면 true 를 반환한다.
+	 * index 째의 추측 결과를 숫자로 반환한다.
+	 * -1: 정답. -2: 정답이 아님. -3: 글자 수 부족. -4: 정답 단어와 글자수가 다름. -5: 사전에 없는 단어.
+	 * 0 ~ 5: 하드 모드 일때 몇 번째 글자가 제 자리가 아닌지 반환한다.
 	 * @param {number} index
-	 * @returns {boolean}
+	 * @returns {ValidateResult}
 	 */
 	const validateAnswer = (index) => {
-		// 단어 검증
 		const currentAnswer = answerList[index];
-		if (currentAnswer.length !== LETTER_BOX_COUNT) {
-			runShakeAnimation(index);
+		const word = Hangul.a(currentAnswer);
 
-			throw new Error('글자 수가 부족합니다.');
+		// 글자 수 검증
+		if (currentAnswer.length !== LETTER_BOX_COUNT) {
+			return ValidateResult.NotEnoughLetters;
 		}
 
-		const word = Hangul.a(currentAnswer);
+		// 하드 모드
+		let settings = localStorage.getItem('Hangle_settings');
+		if (settings) {
+			const settingsJson = JSON.parse(settings);
+			if (settingsJson.hardMode === true) {
+				for (let i = 0; i < index; i++) {
+					if (validateResultList[i] !== undefined) {
+						for (let j = 0; j < LETTER_BOX_COUNT; j++) {
+							if (validateResultList[i][j] === 'correct') {
+								if (currentAnswer.substring(j, j + 1) !== answerList[i].substring(j, j + 1)) {
+									return j;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// NOTE: 추측을 위해서 이 조건은 주석처리하는게 나을까?
 		// if (word.length != answer.length) {
-		// 	runShakeAnimation(index);
-
-		// 	throw new Error('정답 단어와 글자수가 다릅니다.');
+		// 	return ValidateResult.DifferentWordLength;
 		// }
 
+		// 사전에 있는 단어인지 확인
 		if (isValidWord(word) === false) {
-			runShakeAnimation($gameState.tryIndex);
-
-			throw new Error('올바른 단어를 입력하세요.');
+			return ValidateResult.NotExistWord;
 		}
 
 		const validateResult = new Array(currentAnswer.length);
@@ -182,8 +271,10 @@
 			}
 		}
 
+		// 하드 모드를 위해서 검증 결과를 저장
 		validateResultList[index] = validateResult;
 
+		// 플립 애니메이션 수행
 		const lineIndex = index;
 		let letterIndex = 0;
 		const intervalId = setInterval(() => {
@@ -197,9 +288,9 @@
 		}, 300);
 
 		if (validateResult.every((data) => data === 'correct')) {
-			return true;
+			return ValidateResult.Correct;
 		} else {
-			return false;
+			return ValidateResult.Incorrect;
 		}
 	};
 
@@ -231,86 +322,15 @@
 				answerList = newAnswerList;
 			}
 		} else if (character === 'enter' || character === '확인') {
-			let result = false;
-			try {
-				// 하드 모드 검증
-				const currentAnswer = answerList[tryIndex];
-				if (currentAnswer.length === LETTER_BOX_COUNT) {
-					let settings = localStorage.getItem('Hangle_settings');
-					if (settings) {
-						const settingsJson = JSON.parse(settings);
-						if (settingsJson.hardMode === true) {
-							for (let i = 0; i < tryIndex; i++) {
-								if (validateResultList[i] !== undefined) {
-									for (let j = 0; j < LETTER_BOX_COUNT; j++) {
-										if (validateResultList[i][j] === 'correct') {
-											if (currentAnswer.substring(j, j + 1) !== answerList[i].substring(j, j + 1)) {
-												runShakeAnimation(tryIndex);
-
-												throw new Error(`${j + 1} 번째 글자는 '${answerList[i].substring(j, j + 1)}'가 되어야 합니다.`);
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				// 정답 검증
-				result = validateAnswer(tryIndex);
-				if (result === true) {
-					showSnackbar('정답입니다.');
-
-					// 통계 표시
-					setTimeout(() => {
-						const container = document.querySelector('.leaderboard');
-						container.classList.add('open');
-
-						const timing = (timeFraction) => {
-							return timeFraction;
-						};
-
-						const draw = (progress) => {
-							container.style.opacity = progress;
-						};
-
-						animate(timing, draw, 300);
-					}, 3000);
-				} else {
-					if (tryIndex >= TOTAL_TRY_COUNT - 1) {
-						// 추측 가능 횟수를 모두 사용하면 정답을 알려주고 게임 종료
-						tryIndex = TOTAL_TRY_COUNT - 1;
-
-						result = true;
-
-						showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
-					} else {
-						tryIndex = tryIndex + 1;
-					}
-				}
-
-				const newState = {
-					...$gameState,
-					answerList: answerList,
-					tryIndex: tryIndex >= TOTAL_TRY_COUNT ? TOTAL_TRY_COUNT - 1 : tryIndex,
-					isFinished: result,
-				};
-				gameState.set(newState);
-
-				// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
-				let state = localStorage.getItem('Hangle_gameState');
-				let stateJson = JSON.parse(state);
-				stateJson = {
-					...stateJson,
-					[nowDate]: newState,
-				};
-
-				// local storage 에 gameState 저장
-				localStorage.setItem('Hangle_gameState', JSON.stringify(stateJson));
-			} catch (error) {
-				showSnackbar(error.message);
-			}
+			// game state 를 업데이트하면 정답을 검증 함.
+			// 페이지를 다시 로드 했을때 같은 로직을 수행할 수 있도록 하기 위해 이렇게 설정
+			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
+			const newState = {
+				...$gameState,
+				answerList: answerList, // 추측한 단어를 업데이트
+				validateType: ValidateType.Current,
+			};
+			gameState.set(newState);
 		}
 	};
 </script>

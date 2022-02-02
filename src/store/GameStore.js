@@ -1,12 +1,13 @@
 import { writable } from 'svelte/store';
+import { ValidateType } from '../Environment';
 
 // 현재 시도를 저장
 export const gameState = writable({
-	tryIndex: 0, // 0 ~ 6. 6 은 실패를 의미한다.
+	tryIndex: 0, // 0 ~ 5.
 	answerList: ['', '', '', '', '', ''], // [ㅈㅓㅇㄷㅏㅂ, ...]
 	answer: '', // 정답
-	updateDate: '', // yyyy-MM-dd
-	isFinished: false,
+	isFinished: false, // 게임 종료 여부
+	validateType: ValidateType.None, // 검증 작업 진행 여부
 });
 
 export const snackbarMessage = writable('');
