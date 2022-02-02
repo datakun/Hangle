@@ -337,7 +337,6 @@
 			// 저장된 게임 데이터 가져와서 새로운 데이터를 추가한다.
 			const newState = {
 				...$gameState,
-				answerList: answerList, // 추측한 단어를 업데이트
 				validateType: ValidateType.Current,
 			};
 			gameState.set(newState);
