@@ -20,6 +20,7 @@
   "dependencies": {
     "firebase": "^9.6.5",
     "hangul-js": "^0.2.6",
+    "inko": "^1.1.1",
     "sirv-cli": "^2.0.0"
   }
 }

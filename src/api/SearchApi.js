@@ -1,5 +1,5 @@
 import Hangul from 'hangul-js';
-import { getDatabase, ref, onValue, get, child, Database } from 'firebase/database';
+import { getDatabase, ref, get, child } from 'firebase/database';
 import { FIREBASE_CONFIG } from '../Environment';
 import { initializeApp } from 'firebase/app';
 import { getDateString } from '../Utils';

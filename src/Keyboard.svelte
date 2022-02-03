@@ -3,7 +3,9 @@
 	import { createEventDispatcher } from 'svelte';
 	import { gameState } from './store/GameStore';
 	import { MIN_SCREEN_WIDTH } from './Environment';
-	import Hangul from 'hangul-js';
+	import Inko from 'inko';
+
+	let inko = new Inko();
 
 	let answerList = ['', '', '', '', '', ''];
 	let answer = '';
@@ -47,7 +49,11 @@
 	};
 
 	const handleKeyInput = (e) => {
-		dispatch('keyInsert', e.key.toLowerCase());
+		let input = e.key.toLowerCase();
+		if (input.length === 1) {
+			input = inko.en2ko(input);
+		}
+		dispatch('keyInsert', input);
 	};
 </script>
 

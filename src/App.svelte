@@ -378,6 +378,7 @@
 		if (input.length === 1) {
 			// 한글 자음 모음 삽입
 			if (input.match(/[ㄱ-ㅎㅏ-ㅣ]/)) {
+				// 한글을 입력 받았을 때
 				let currentAnswer = answerList[tryIndex];
 				if (currentAnswer.length < LETTER_BOX_COUNT) {
 					currentAnswer += input;
