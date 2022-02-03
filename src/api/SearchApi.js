@@ -40,6 +40,34 @@ export function isValidWord(word) {
 	return false;
 }
 
+// export function mergeTwoJsArray() {
+// 	const wordSet = new Set();
+// 	const result = [];
+
+// 	for (const item of words) {
+// 		wordSet.add(item);
+// 	}
+
+// 	for (const item of valids) {
+// 		wordSet.add(item);
+// 	}
+
+// 	for (const word of wordSet) {
+// 		if (Hangul.isCompleteAll(word) === false) {
+// 			continue;
+// 		}
+
+// 		const disassembledWord = Hangul.d(word);
+// 		if (disassembledWord.length !== 6) {
+// 			continue;
+// 		}
+
+// 		result.push(word);
+// 	}
+
+// 	console.log(result);
+// }
+
 // export function parseAndCreateWords() {
 // 	const now = new Date();
 // 	let nowDate = getDateString(now);
