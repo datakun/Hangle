@@ -365,3 +365,19 @@ body.color-blind-mode .share-button {
 .flipper .box.back.flip {
 	transform: rotateX(0deg);
 }
+
+.jump {
+	-moz-animation: jump 0.2s ease-in 2 alternate;
+	-webkit-animation: jump 0.2s ease-in 2 alternate;
+	animation: jump 0.2s ease-in 2 alternate;
+}
+
+@keyframes jump {
+	from {
+		top: 0px;
+	}
+
+	to {
+		top: -24px;
+	}
+}

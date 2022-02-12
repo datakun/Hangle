@@ -80,21 +80,38 @@
 			} else if (result === ValidateResult.Correct) {
 				showSnackbar('정답입니다.');
 
-				// 통계 표시
 				setTimeout(() => {
-					const container = document.querySelector('.leaderboard');
-					container.classList.add('open');
+					let letterIndex = 0;
+					const intervalId = setInterval(() => {
+						// 튀어오르는 애니메이션
+						const rowContainer = document.getElementById(`line-${tryIndex}`);
+						rowContainer.querySelectorAll(`.flipper .box.letter-${letterIndex}`).forEach((element) => {
+							element.classList.add('jump');
+						});
 
-					const timing = (timeFraction) => {
-						return timeFraction;
-					};
+						letterIndex++;
 
-					const draw = (progress) => {
-						container.style.opacity = progress;
-					};
+						if (letterIndex === LETTER_BOX_COUNT) {
+							clearInterval(intervalId);
 
-					animate(timing, draw, 300);
-				}, 3000);
+							setTimeout(() => {
+								// 애니메이션을 실행하고나서 통계 표시
+								const container = document.querySelector('.leaderboard');
+								container.classList.add('open');
+
+								const timing = (timeFraction) => {
+									return timeFraction;
+								};
+
+								const draw = (progress) => {
+									container.style.opacity = progress;
+								};
+
+								animate(timing, draw, 300);
+							}, 600);
+						}
+					}, 200);
+				}, 1800);
 			} else if (result === ValidateResult.Incorrect) {
 				if (isFinished === true && isLastTry === true) {
 					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
