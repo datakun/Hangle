@@ -13,6 +13,7 @@
 	let answer = '';
 	let tryIndex = 0;
 	let isFinished = false;
+	let isPlayable = false;
 
 	let totalGameState = {};
 
@@ -182,6 +183,9 @@
 					}
 				}
 			}
+
+			// 게임 플레이 가능
+			isPlayable = true;
 		} else {
 			// 저장된 게임 데이터가 없다면 새로 생성하기
 			needInitialize = true;
@@ -191,6 +195,9 @@
 			// 새로 생성이 필요하면 answer 초기화
 			const correctAnswer = await getTodayWord();
 			if (correctAnswer === null) {
+				// 게임을 플레이 할 수 없도록 해야 함
+				isPlayable = false;
+
 				return;
 			}
 
@@ -386,7 +393,7 @@
 	};
 
 	const handleKeyInsert = async (e) => {
-		if (tryIndex >= TOTAL_TRY_COUNT || isFinished === true) {
+		if (isPlayable === false || tryIndex >= TOTAL_TRY_COUNT || isFinished === true) {
 			// 시도 횟수를 초과하면 이벤트 처리 안 함
 			return;
 		}
