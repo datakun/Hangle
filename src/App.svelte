@@ -393,7 +393,13 @@
 	};
 
 	const handleKeyInsert = async (e) => {
-		if (isPlayable === false || tryIndex >= TOTAL_TRY_COUNT || isFinished === true) {
+		if (isPlayable === false) {
+			showSnackbar('오늘의 단어를 받아오지 못했습니다. 내일 다시 시도해주세요.');
+
+			return;
+		}
+
+		if (tryIndex >= TOTAL_TRY_COUNT || isFinished === true) {
 			// 시도 횟수를 초과하면 이벤트 처리 안 함
 			return;
 		}
