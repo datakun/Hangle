@@ -114,8 +114,9 @@
 					}, 200);
 				}, 1800);
 			} else if (result === ValidateResult.Incorrect) {
-				if (isFinished === true && isLastTry === true) {
+				if (value.answerList[tryIndex].length === LETTER_BOX_COUNT && isLastTry === true) {
 					// 정답을 맞추지 못했는데, 시도 횟수가 초과되었을 때.
+					// tryIndex 의 answerList 가 입력되어야 정답을 알려줘야 함.
 					showSnackbar(`${answer}\n[${Hangul.d(answer).join(',')}]`);
 				}
 			}

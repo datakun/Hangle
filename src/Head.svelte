@@ -453,7 +453,7 @@
 			<div style="padding: 16px; padding-left: 32px; padding-right: 32px; display: flex; flex-direction: column; justify-content: center;">
 				{#each distribution as item, i}
 					<div style="display: flex; margin: 3px; height: 20px; line-height: 16px;">
-						{i}
+						{i + 1}
 						<div
 							class="bar"
 							style="background-color: {isCorrect === true && todayTryIndex === i ? 'rgb(97, 140, 85)' : 'rgb(58, 58, 58)'};{item === 0
