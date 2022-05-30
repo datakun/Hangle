@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte/internal';
-	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH, TOTAL_TRY_COUNT } from './Environment';
+	import { LETTER_BOX_COUNT, MIN_SCREEN_WIDTH, STARTED_DATE, TOTAL_TRY_COUNT } from './Environment';
 	import { animate, getDateString, showSnackbar } from './Utils';
 	import Hangul from 'hangul-js';
 	import Switch from './Switch.svelte';
@@ -28,6 +28,9 @@
 	const now = new Date();
 	const nowDate = getDateString(now);
 	const nowDateForShare = getDateString(now, '/');
+
+	// 몇 번째 퀴즈인가?
+	const todayNumber = Math.floor((now.getTime() - new Date(STARTED_DATE).getTime()) / (24 * 60 * 60 * 1000));
 
 	let settings = localStorage.getItem('Hangle_settings');
 	let settingsJson = {};
@@ -139,7 +142,8 @@
 
 			// 공유용 메시지 생성
 			const correctLetters = Hangul.d(todayGameState.answer);
-			shareText = `한:글 (${nowDateForShare}) ${isCorrect === true ? todayTryIndex + 1 : 'X'}/${TOTAL_TRY_COUNT}\n`;
+			const todayNumber = Math.floor((now.getTime() - new Date(STARTED_DATE).getTime()) / (24 * 60 * 60 * 1000));
+			shareText = `한:글 ${nowDateForShare}(#${todayNumber.toLocaleString()}) ${isCorrect === true ? todayTryIndex + 1 : 'X'}/${TOTAL_TRY_COUNT}\n`;
 			for (let i = 0; i <= todayTryIndex; i++) {
 				const currentAnswer = todayGameState.answerList[i];
 				const validateResult = new Array(currentAnswer.length);
@@ -364,7 +368,10 @@
 	<div class="head-button" title="How To Play" on:click={handleHelpClick}>
 		<span class="material-icons">help</span>
 	</div>
-	<h1 class="title">한:글</h1>
+	<div class="title">
+		<h1>한:글</h1>
+		<h3>{todayNumber.toLocaleString()}번째</h3>
+	</div>
 	<div class="right">
 		<div class="head-button" title="Leaderboard" on:click={handleLeaderboardClick}>
 			<span class="material-icons">leaderboard</span>
@@ -550,9 +557,17 @@
 		transform: translate(-50%);
 		align-self: center;
 		text-align: center;
-		font-size: 2.3em;
 		font-weight: 800;
 		letter-spacing: 3px;
+	}
+
+	.head .title h1 {
+		margin: 0px;
+	}
+
+	.head .title h3 {
+		margin: 0px;
+		margin-top: -0.5em;
 	}
 
 	.right {

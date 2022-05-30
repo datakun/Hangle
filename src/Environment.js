@@ -1,6 +1,7 @@
 export const MIN_SCREEN_WIDTH = 480;
 export const LETTER_BOX_COUNT = 6;
 export const TOTAL_TRY_COUNT = 6;
+export const STARTED_DATE = '2022-02-01';
 export const FIREBASE_CONFIG = {
 	apiKey: 'AIzaSyD0M3JbqxZk8au--8Efwgke9plv4GR-4Bc',
 	authDomain: 'hangle-5db1b.firebaseapp.com',

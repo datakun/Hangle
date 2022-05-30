@@ -11,7 +11,7 @@ const fbApp = initializeApp(FIREBASE_CONFIG);
 
 /**
  * 단어의 자음 모을을 문자열 배열로 반환한다.
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
 export async function getTodayWord() {
 	const now = new Date();
